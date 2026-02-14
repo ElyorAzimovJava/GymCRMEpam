@@ -66,7 +66,9 @@ public class TraineeService {
     }
 
     private boolean isUsernameTaken(String username) {
-        return traineeDAO.findAll().stream().anyMatch(trainee -> trainee.getUsername().equals(username));
+        return traineeDAO.findAll().stream()
+                .filter(trainee -> trainee.getUsername() != null)
+                .anyMatch(trainee -> trainee.getUsername().equals(username));
     }
 
     private String generatePassword() {

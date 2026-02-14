@@ -1,11 +1,18 @@
 package com.epam.service.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.concurrent.atomic.AtomicLong;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
     private static final AtomicLong idCounter = new AtomicLong();
 
-    private final long id;
+    private long id;
     private String firstName;
     private String lastName;
     private String username;
@@ -19,50 +26,5 @@ public class User {
         this.username = username;
         this.password = password;
         this.isActive = isActive;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public boolean isActive() {
-        return isActive;
-    }
-
-    public void setActive(boolean active) {
-        isActive = active;
     }
 }
