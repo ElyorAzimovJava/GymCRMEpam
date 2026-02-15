@@ -4,8 +4,8 @@ import com.epam.service.dao.TrainingDAO;
 import com.epam.service.model.Training;
 import com.epam.service.model.TrainingType;
 import com.epam.service.service.TrainingService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -13,7 +13,7 @@ import org.mockito.MockitoAnnotations;
 import java.util.Date;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -25,15 +25,21 @@ public class TrainingServiceTest {
     @Mock
     private TrainingDAO trainingDAO;
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
     public void testCreateTraining() {
-        TrainingType trainingType = new TrainingType("Java Development");
-        Training training = new Training(1L, 1L, "Java Training", trainingType, new Date(), 60);
+        Training training = Training.builder()
+                .traineeId(1L)
+                .trainerId(1L)
+                .trainingName("Java Training")
+                .trainingType(TrainingType.YOGA)
+                .trainingDate(new Date())
+                .trainingDuration(60)
+                .build();
         when(trainingDAO.save(any(Training.class))).thenReturn(training);
 
         Training createdTraining = trainingService.createTraining(training);
@@ -43,8 +49,14 @@ public class TrainingServiceTest {
 
     @Test
     public void testSelectTraining() {
-        TrainingType trainingType = new TrainingType("Java Development");
-        Training training = new Training(1L, 1L, "Java Training", trainingType, new Date(), 60);
+        Training training = Training.builder()
+                .traineeId(1L)
+                .trainerId(1L)
+                .trainingName("Java Training")
+                .trainingType(TrainingType.YOGA)
+                .trainingDate(new Date())
+                .trainingDuration(60)
+                .build();
         when(trainingDAO.findById(1L)).thenReturn(Optional.of(training));
 
         Optional<Training> selectedTraining = trainingService.selectTraining(1L);

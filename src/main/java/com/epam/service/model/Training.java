@@ -1,6 +1,7 @@
 package com.epam.service.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +11,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Training {
     private static final AtomicLong idCounter = new AtomicLong();
 
@@ -21,13 +23,4 @@ public class Training {
     private Date trainingDate;
     private int trainingDuration;
 
-    public Training(long traineeId, long trainerId, String trainingName, TrainingType trainingType, Date trainingDate, int trainingDuration) {
-        this.id = idCounter.incrementAndGet();
-        this.traineeId = traineeId;
-        this.trainerId = trainerId;
-        this.trainingName = trainingName;
-        this.trainingType = trainingType;
-        this.trainingDate = trainingDate;
-        this.trainingDuration = trainingDuration;
-    }
 }

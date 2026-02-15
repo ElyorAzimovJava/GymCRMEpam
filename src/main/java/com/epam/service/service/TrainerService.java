@@ -1,7 +1,9 @@
 package com.epam.service.service;
 
+import com.epam.service.dao.TraineeDAO;
 import com.epam.service.dao.TrainerDAO;
 import com.epam.service.model.Trainer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 
 @Service
 public class TrainerService {
@@ -17,16 +18,18 @@ public class TrainerService {
     private static final Logger logger = LoggerFactory.getLogger(TrainerService.class);
 
     private final TrainerDAO trainerDAO;
+    private final UserUsername userUsername;
 
     @Autowired
-    public TrainerService(TrainerDAO trainerDAO) {
+    public TrainerService(TrainerDAO trainerDAO, TraineeDAO traineeDAO) {
         this.trainerDAO = trainerDAO;
+        this.userUsername = new UserUsername(traineeDAO, trainerDAO);
     }
 
     public Trainer createTrainer(Trainer trainer) {
         logger.info("Creating trainer for user: {} {}", trainer.getFirstName(), trainer.getLastName());
-        String username = generateUsername(trainer.getFirstName(), trainer.getLastName());
-        String password = generatePassword();
+        String username = userUsername.generateUsername(trainer.getFirstName(), trainer.getLastName());
+        String password = PasswordGenerator.generatePassword();
         trainer.setUsername(username);
         trainer.setPassword(password);
         Trainer savedTrainer = trainerDAO.save(trainer);
@@ -49,30 +52,5 @@ public class TrainerService {
         return trainerDAO.findAll();
     }
 
-    private String generateUsername(String firstName, String lastName) {
-        String baseUsername = firstName + "." + lastName;
-        String username = baseUsername;
-        int serialNumber = 1;
-        while (isUsernameTaken(username)) {
-            username = baseUsername + serialNumber;
-            serialNumber++;
-        }
-        return username;
-    }
 
-    private boolean isUsernameTaken(String username) {
-        return trainerDAO.findAll().stream()
-                .filter(trainer -> trainer.getUsername() != null)
-                .anyMatch(trainer -> trainer.getUsername().equals(username));
-    }
-
-    private String generatePassword() {
-        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        StringBuilder password = new StringBuilder();
-        Random random = new Random();
-        for (int i = 0; i < 10; i++) {
-            password.append(chars.charAt(random.nextInt(chars.length())));
-        }
-        return password.toString();
-    }
 }

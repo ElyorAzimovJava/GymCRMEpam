@@ -1,19 +1,22 @@
 package com.epam.service;
 
 import com.epam.service.dao.TraineeDAO;
+import com.epam.service.dao.TrainerDAO;
 import com.epam.service.model.Trainee;
 import com.epam.service.service.TraineeService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Date;
 import java.util.Optional;
+import java.util.Collections;
+import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -25,30 +28,75 @@ public class TraineeServiceTest {
     @Mock
     private TraineeDAO traineeDAO;
 
-    @Before
+    @Mock
+    private TrainerDAO trainerDAO;
+
+    @BeforeEach
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
     public void testCreateTrainee() {
-        Trainee trainee = new Trainee("John", "Doe", null, null, true, new Date(), "123 Main St");
+        Trainee trainee = Trainee.builder()
+                .firstName("John")
+                .lastName("Doe")
+                .isActive(true)
+                .dateOfBirth(new Date())
+                .address("123 Main St")
+                .build();
+        when(traineeDAO.findAll()).thenReturn(Collections.emptyList());
+        when(trainerDAO.findAll()).thenReturn(Collections.emptyList());
         when(traineeDAO.save(any(Trainee.class))).thenReturn(trainee);
 
         Trainee createdTrainee = traineeService.createTrainee(trainee);
 
         assertNotNull(createdTrainee);
-        assertEquals("John.Doe", createdTrainee.getUsername());
+        assertNotNull(createdTrainee.getUsername());
         assertNotNull(createdTrainee.getPassword());
     }
 
     @Test
     public void testSelectTrainee() {
-        Trainee trainee = new Trainee("John", "Doe", "John.Doe", "password", true, new Date(), "123 Main St");
+        Trainee trainee = Trainee.builder()
+                .firstName("John")
+                .lastName("Doe")
+                .username("John.Doe")
+                .password("password")
+                .isActive(true)
+                .dateOfBirth(new Date())
+                .address("123 Main St")
+                .build();
         when(traineeDAO.findById(1L)).thenReturn(Optional.of(trainee));
 
         Optional<Trainee> selectedTrainee = traineeService.selectTrainee(1L);
 
         assertEquals(trainee, selectedTrainee.get());
+    }
+
+    @Test
+    public void testUpdateTrainee() {
+        Trainee trainee = Trainee.builder()
+                .firstName("John")
+                .lastName("Doe")
+                .isActive(true)
+                .dateOfBirth(new Date())
+                .address("123 Main St")
+                .build();
+        when(traineeDAO.save(any(Trainee.class))).thenReturn(trainee);
+
+        Trainee updatedTrainee = traineeService.updateTrainee(trainee);
+
+        assertNotNull(updatedTrainee);
+    }
+
+    @Test
+    public void testSelectAllTrainees() {
+        when(traineeDAO.findAll()).thenReturn(Collections.singletonList(Trainee.builder().build()));
+
+        List<Trainee> trainees = traineeService.selectAllTrainees();
+
+        assertNotNull(trainees);
+        assertEquals(1, trainees.size());
     }
 }

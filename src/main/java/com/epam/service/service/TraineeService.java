@@ -1,6 +1,7 @@
 package com.epam.service.service;
 
 import com.epam.service.dao.TraineeDAO;
+import com.epam.service.dao.TrainerDAO;
 import com.epam.service.model.Trainee;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,16 +18,18 @@ public class TraineeService {
     private static final Logger logger = LoggerFactory.getLogger(TraineeService.class);
 
     private final TraineeDAO traineeDAO;
+    private final UserUsername userUsername;
 
     @Autowired
-    public TraineeService(TraineeDAO traineeDAO) {
+    public TraineeService(TraineeDAO traineeDAO, TrainerDAO trainerDAO) {
         this.traineeDAO = traineeDAO;
+        this.userUsername = new UserUsername(traineeDAO, trainerDAO);
     }
 
     public Trainee createTrainee(Trainee trainee) {
         logger.info("Creating trainee for user: {} {}", trainee.getFirstName(), trainee.getLastName());
-        String username = generateUsername(trainee.getFirstName(), trainee.getLastName());
-        String password = generatePassword();
+        String username = userUsername.generateUsername(trainee.getFirstName(), trainee.getLastName());
+        String password = PasswordGenerator.generatePassword();
         trainee.setUsername(username);
         trainee.setPassword(password);
         Trainee savedTrainee = traineeDAO.save(trainee);
@@ -54,30 +57,5 @@ public class TraineeService {
         return traineeDAO.findAll();
     }
 
-    private String generateUsername(String firstName, String lastName) {
-        String baseUsername = firstName + "." + lastName;
-        String username = baseUsername;
-        int serialNumber = 1;
-        while (isUsernameTaken(username)) {
-            username = baseUsername + serialNumber;
-            serialNumber++;
-        }
-        return username;
-    }
 
-    private boolean isUsernameTaken(String username) {
-        return traineeDAO.findAll().stream()
-                .filter(trainee -> trainee.getUsername() != null)
-                .anyMatch(trainee -> trainee.getUsername().equals(username));
-    }
-
-    private String generatePassword() {
-        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        StringBuilder password = new StringBuilder();
-        Random random = new Random();
-        for (int i = 0; i < 10; i++) {
-            password.append(chars.charAt(random.nextInt(chars.length())));
-        }
-        return password.toString();
-    }
 }

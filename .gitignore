@@ -43,5 +43,4 @@ mvnw.cmd
 
 # Secrets
 secrets.yml
-application.properties
 .env

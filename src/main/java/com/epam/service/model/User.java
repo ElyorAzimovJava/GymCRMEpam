@@ -3,12 +3,14 @@ package com.epam.service.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.util.concurrent.atomic.AtomicLong;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@SuperBuilder
 public class User {
     private static final AtomicLong idCounter = new AtomicLong();
 
@@ -19,12 +21,4 @@ public class User {
     private String password;
     private boolean isActive;
 
-    public User(String firstName, String lastName, String username, String password, boolean isActive) {
-        this.id = idCounter.incrementAndGet();
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.username = username;
-        this.password = password;
-        this.isActive = isActive;
-    }
 }

@@ -3,6 +3,9 @@ package com.epam.service.dao;
 import com.epam.service.model.Trainee;
 import com.epam.service.model.Trainer;
 import com.epam.service.model.Training;
+import com.epam.service.service.PasswordGenerator;
+import com.epam.service.service.UserUsername;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +23,7 @@ import java.util.Map;
 import java.util.Properties;
 
 @Component
+@Getter
 public class Storage {
 
     private static final Logger logger = LoggerFactory.getLogger(Storage.class);
@@ -42,6 +46,7 @@ public class Storage {
             loadTrainers(properties);
         } catch (IOException ex) {
             logger.error("Failed to load initial data from file: {}", initialDataPath, ex);
+            throw new RuntimeException("Failed to load initial data", ex);
         }
     }
 
@@ -59,7 +64,17 @@ public class Storage {
 
                     try {
                         Date dateOfBirth = new SimpleDateFormat("yyyy-MM-dd").parse(dateOfBirthStr);
-                        Trainee trainee = new Trainee(firstName, lastName, null, null, isActive, dateOfBirth, address);
+                        String username = generateUsername(firstName, lastName);
+                        String password = PasswordGenerator.generatePassword();
+                        Trainee trainee = Trainee.builder()
+                                .firstName(firstName)
+                                .lastName(lastName)
+                                .username(username)
+                                .password(password)
+                                .isActive(isActive)
+                                .dateOfBirth(dateOfBirth)
+                                .address(address)
+                                .build();
                         traineeStore.put(trainee.getId(), trainee);
                         logger.info("Loaded trainee: {} {}", firstName, lastName);
                     } catch (ParseException e) {
@@ -79,21 +94,36 @@ public class Storage {
                     String specialization = properties.getProperty("trainer." + id + ".specialization");
                     boolean isActive = Boolean.parseBoolean(properties.getProperty("trainer." + id + ".active"));
 
-                    Trainer trainer = new Trainer(firstName, lastName, null, null, isActive, specialization);
+                    String username = generateUsername(firstName, lastName);
+                    String password = PasswordGenerator.generatePassword();
+                    Trainer trainer = Trainer.builder()
+                            .firstName(firstName)
+                            .lastName(lastName)
+                            .username(username)
+                            .password(password)
+                            .isActive(isActive)
+                            .specialization(specialization)
+                            .build();
                     trainerStore.put(trainer.getId(), trainer);
                     logger.info("Loaded trainer: {} {}", firstName, lastName);
                 });
     }
 
-    public Map<Long, Trainee> getTraineeStore() {
-        return traineeStore;
+    private String generateUsername(String firstName, String lastName) {
+        String baseUsername = firstName + "." + lastName;
+        String username = baseUsername;
+        int serialNumber = 1;
+        while (isUsernameTaken(username)) {
+            username = baseUsername + serialNumber;
+            serialNumber++;
+        }
+        return username;
     }
 
-    public Map<Long, Trainer> getTrainerStore() {
-        return trainerStore;
-    }
-
-    public Map<Long, Training> getTrainingStore() {
-        return trainingStore;
+    private boolean isUsernameTaken(String username) {
+        return traineeStore.values().stream()
+                .anyMatch(trainee -> trainee.getUsername().equals(username)) ||
+                trainerStore.values().stream()
+                        .anyMatch(trainer -> trainer.getUsername().equals(username));
     }
 }

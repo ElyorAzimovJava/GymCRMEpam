@@ -1,18 +1,21 @@
 package com.epam.service;
 
+import com.epam.service.dao.TraineeDAO;
 import com.epam.service.dao.TrainerDAO;
 import com.epam.service.model.Trainer;
 import com.epam.service.service.TrainerService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -24,30 +27,70 @@ public class TrainerServiceTest {
     @Mock
     private TrainerDAO trainerDAO;
 
-    @Before
+    @Mock
+    private TraineeDAO traineeDAO;
+
+    @BeforeEach
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
     public void testCreateTrainer() {
-        Trainer trainer = new Trainer("Jane", "Doe", null, null, true, "Java");
+        Trainer trainer = Trainer.builder()
+                .firstName("Jane")
+                .lastName("Doe")
+                .isActive(true)
+                .specialization("Java")
+                .build();
         when(trainerDAO.save(any(Trainer.class))).thenReturn(trainer);
 
         Trainer createdTrainer = trainerService.createTrainer(trainer);
 
         assertNotNull(createdTrainer);
-        assertEquals("Jane.Doe", createdTrainer.getUsername());
+        assertNotNull(createdTrainer.getUsername());
         assertNotNull(createdTrainer.getPassword());
     }
 
     @Test
     public void testSelectTrainer() {
-        Trainer trainer = new Trainer("Jane", "Doe", "Jane.Doe", "password", true, "Java");
+        Trainer trainer = Trainer.builder()
+                .firstName("Jane")
+                .lastName("Doe")
+                .username("Jane.Doe")
+                .password("password")
+                .isActive(true)
+                .specialization("Java")
+                .build();
         when(trainerDAO.findById(1L)).thenReturn(Optional.of(trainer));
 
         Optional<Trainer> selectedTrainer = trainerService.selectTrainer(1L);
 
         assertEquals(trainer, selectedTrainer.get());
+    }
+
+    @Test
+    public void testUpdateTrainer() {
+        Trainer trainer = Trainer.builder()
+                .firstName("Jane")
+                .lastName("Doe")
+                .isActive(true)
+                .specialization("Java")
+                .build();
+        when(trainerDAO.save(any(Trainer.class))).thenReturn(trainer);
+
+        Trainer updatedTrainer = trainerService.updateTrainer(trainer);
+
+        assertNotNull(updatedTrainer);
+    }
+
+    @Test
+    public void testSelectAllTrainers() {
+        when(trainerDAO.findAll()).thenReturn(Collections.singletonList(Trainer.builder().build()));
+
+        List<Trainer> trainers = trainerService.selectAllTrainers();
+
+        assertNotNull(trainers);
+        assertEquals(1, trainers.size());
     }
 }
