@@ -1,49 +1,47 @@
 package com.epam.service.dao;
 
 import com.epam.service.model.Trainer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public class TrainerDAO implements BaseDAO<Trainer> {
 
-    private static final Logger logger = LoggerFactory.getLogger(TrainerDAO.class);
-
-    private final Storage storage;
-
     @Autowired
-    public TrainerDAO(Storage storage) {
-        this.storage = storage;
-    }
+    private SessionFactory sessionFactory;
 
     @Override
     public List<Trainer> findAll() {
-        logger.debug("Finding all trainers");
-        return new ArrayList<>(storage.getTrainerStore().values());
+        return getCurrentSession().createQuery("from Trainer").list();
     }
 
     @Override
-    public Optional<Trainer> findById(long id) {
-        logger.debug("Finding trainer by id: {}", id);
-        return Optional.ofNullable(storage.getTrainerStore().get(id));
+    public Trainer findById(long id) {
+        return getCurrentSession().get(Trainer.class, id);
     }
 
     @Override
     public Trainer save(Trainer entity) {
-        logger.debug("Saving trainer with id: {}", entity.getId());
-        storage.getTrainerStore().put(entity.getId(), entity);
+        getCurrentSession().persist(entity);
         return entity;
     }
 
     @Override
     public void delete(long id) {
-        logger.debug("Deleting trainer with id: {}", id);
-        storage.getTrainerStore().remove(id);
+        Trainer trainer = findById(id);
+        getCurrentSession().delete(trainer);
+    }
+
+    @Override
+    public Trainer update(Trainer entity) {
+        return (Trainer) getCurrentSession().merge(entity);
+    }
+
+    protected Session getCurrentSession() {
+        return sessionFactory.getCurrentSession();
     }
 }

@@ -1,6 +1,8 @@
 package com.epam.service;
 
 import com.epam.service.dao.TrainingDAO;
+import com.epam.service.model.Trainee;
+import com.epam.service.model.Trainer;
 import com.epam.service.model.Training;
 import com.epam.service.model.TrainingType;
 import com.epam.service.service.TrainingService;
@@ -11,7 +13,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Date;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -33,8 +34,9 @@ public class TrainingServiceTest {
     @Test
     public void testCreateTraining() {
         Training training = Training.builder()
-                .traineeId(1L)
-                .trainerId(1L)
+                .id(1)
+                .trainee(new Trainee())
+                .trainer(new Trainer())
                 .trainingName("Java Training")
                 .trainingType(TrainingType.YOGA)
                 .trainingDate(new Date())
@@ -50,17 +52,17 @@ public class TrainingServiceTest {
     @Test
     public void testSelectTraining() {
         Training training = Training.builder()
-                .traineeId(1L)
-                .trainerId(1L)
+                .trainee(new Trainee())
+                .trainer(new Trainer())
                 .trainingName("Java Training")
                 .trainingType(TrainingType.YOGA)
                 .trainingDate(new Date())
                 .trainingDuration(60)
                 .build();
-        when(trainingDAO.findById(1L)).thenReturn(Optional.of(training));
+        when(trainingDAO.findById(1L)).thenReturn(training);
 
-        Optional<Training> selectedTraining = trainingService.selectTraining(1L);
+        Training selectedTraining = trainingService.selectTraining(1L);
 
-        assertEquals(training, selectedTraining.get());
+        assertEquals(training, selectedTraining);
     }
 }

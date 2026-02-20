@@ -11,7 +11,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Date;
-import java.util.Optional;
 import java.util.Collections;
 import java.util.List;
 
@@ -67,11 +66,11 @@ public class TraineeServiceTest {
                 .dateOfBirth(new Date())
                 .address("123 Main St")
                 .build();
-        when(traineeDAO.findById(1L)).thenReturn(Optional.of(trainee));
+        when(traineeDAO.findById(1L)).thenReturn(trainee);
 
-        Optional<Trainee> selectedTrainee = traineeService.selectTrainee(1L);
+        Trainee selectedTrainee = traineeService.selectTrainee(1L);
 
-        assertEquals(trainee, selectedTrainee.get());
+        assertEquals(trainee, selectedTrainee);
     }
 
     @Test
@@ -83,7 +82,7 @@ public class TraineeServiceTest {
                 .dateOfBirth(new Date())
                 .address("123 Main St")
                 .build();
-        when(traineeDAO.save(any(Trainee.class))).thenReturn(trainee);
+        when(traineeDAO.update(any(Trainee.class))).thenReturn(trainee);
 
         Trainee updatedTrainee = traineeService.updateTrainee(trainee);
 

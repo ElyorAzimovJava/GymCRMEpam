@@ -6,9 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class TrainingService {
@@ -22,16 +22,20 @@ public class TrainingService {
         this.trainingDAO = trainingDAO;
     }
 
+    @Transactional
     public Training createTraining(Training training) {
         logger.info("Creating training: {}", training.getTrainingName());
-        return trainingDAO.save(training);
+        trainingDAO.save(training);
+        return training;
     }
 
-    public Optional<Training> selectTraining(long id) {
+    @Transactional(readOnly = true)
+    public Training selectTraining(long id) {
         logger.info("Selecting training with id: {}", id);
         return trainingDAO.findById(id);
     }
 
+    @Transactional(readOnly = true)
     public List<Training> selectAllTrainings() {
         logger.info("Selecting all trainings");
         return trainingDAO.findAll();

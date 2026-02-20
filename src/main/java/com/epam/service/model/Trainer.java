@@ -1,7 +1,11 @@
 package com.epam.service.model;
 
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+
+import java.io.Serializable;
+import java.util.List;
 
 @Getter
 @Setter
@@ -9,7 +13,16 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
-public class Trainer extends User {
-    private String specialization;
+@Entity
+public class Trainer extends User implements Serializable {
+
+    @Enumerated(EnumType.STRING)
+    private TrainingType specialization;
+
+    @ManyToMany(mappedBy = "trainers")
+    private List<Trainee> trainees;
+
+    @OneToMany(mappedBy = "trainer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Training> trainings;
 
 }

@@ -1,49 +1,47 @@
 package com.epam.service.dao;
 
 import com.epam.service.model.Trainee;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public class TraineeDAO implements BaseDAO<Trainee> {
 
-    private static final Logger logger = LoggerFactory.getLogger(TraineeDAO.class);
-
-    private final Storage storage;
-
     @Autowired
-    public TraineeDAO(Storage storage) {
-        this.storage = storage;
-    }
+    private SessionFactory sessionFactory;
 
     @Override
     public List<Trainee> findAll() {
-        logger.debug("Finding all trainees");
-        return new ArrayList<>(storage.getTraineeStore().values());
+        return getCurrentSession().createQuery("from Trainee").list();
     }
 
     @Override
-    public Optional<Trainee> findById(long id) {
-        logger.debug("Finding trainee by id: {}", id);
-        return Optional.ofNullable(storage.getTraineeStore().get(id));
+    public Trainee findById(long id) {
+        return getCurrentSession().get(Trainee.class, id);
     }
 
     @Override
     public Trainee save(Trainee entity) {
-        logger.debug("Saving trainee with id: {}", entity.getId());
-        storage.getTraineeStore().put(entity.getId(), entity);
+        getCurrentSession().persist(entity);
         return entity;
     }
 
     @Override
     public void delete(long id) {
-        logger.debug("Deleting trainee with id: {}", id);
-        storage.getTraineeStore().remove(id);
+        Trainee trainee = findById(id);
+        getCurrentSession().delete(trainee);
+    }
+
+    @Override
+    public Trainee update(Trainee entity) {
+        return (Trainee) getCurrentSession().merge(entity);
+    }
+
+    protected Session getCurrentSession() {
+        return sessionFactory.getCurrentSession();
     }
 }

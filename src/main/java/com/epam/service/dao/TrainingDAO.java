@@ -1,49 +1,47 @@
 package com.epam.service.dao;
 
 import com.epam.service.model.Training;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public class TrainingDAO implements BaseDAO<Training> {
 
-    private static final Logger logger = LoggerFactory.getLogger(TrainingDAO.class);
-
-    private final Storage storage;
-
     @Autowired
-    public TrainingDAO(Storage storage) {
-        this.storage = storage;
-    }
+    private SessionFactory sessionFactory;
 
     @Override
     public List<Training> findAll() {
-        logger.debug("Finding all trainings");
-        return new ArrayList<>(storage.getTrainingStore().values());
+        return getCurrentSession().createQuery("from Training").list();
     }
 
     @Override
-    public Optional<Training> findById(long id) {
-        logger.debug("Finding training by id: {}", id);
-        return Optional.ofNullable(storage.getTrainingStore().get(id));
+    public Training findById(long id) {
+        return getCurrentSession().get(Training.class, id);
     }
 
     @Override
     public Training save(Training entity) {
-        logger.debug("Saving training with id: {}", entity.getId());
-        storage.getTrainingStore().put(entity.getId(), entity);
+        getCurrentSession().persist(entity);
         return entity;
     }
 
     @Override
     public void delete(long id) {
-        logger.debug("Deleting training with id: {}", id);
-        storage.getTrainingStore().remove(id);
+        Training training = findById(id);
+        getCurrentSession().delete(training);
+    }
+
+    @Override
+    public Training update(Training entity) {
+        return (Training) getCurrentSession().merge(entity);
+    }
+
+    protected Session getCurrentSession() {
+        return sessionFactory.getCurrentSession();
     }
 }

@@ -3,6 +3,7 @@ package com.epam.service;
 import com.epam.service.dao.TraineeDAO;
 import com.epam.service.dao.TrainerDAO;
 import com.epam.service.model.Trainer;
+import com.epam.service.model.TrainingType;
 import com.epam.service.service.TrainerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,7 +13,6 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -41,7 +41,7 @@ public class TrainerServiceTest {
                 .firstName("Jane")
                 .lastName("Doe")
                 .isActive(true)
-                .specialization("Java")
+                .specialization(TrainingType.CARDIO)
                 .build();
         when(trainerDAO.save(any(Trainer.class))).thenReturn(trainer);
 
@@ -60,13 +60,13 @@ public class TrainerServiceTest {
                 .username("Jane.Doe")
                 .password("password")
                 .isActive(true)
-                .specialization("Java")
+                .specialization(TrainingType.CARDIO)
                 .build();
-        when(trainerDAO.findById(1L)).thenReturn(Optional.of(trainer));
+        when(trainerDAO.findById(1L)).thenReturn(trainer);
 
-        Optional<Trainer> selectedTrainer = trainerService.selectTrainer(1L);
+        Trainer selectedTrainer = trainerService.selectTrainer(1L);
 
-        assertEquals(trainer, selectedTrainer.get());
+        assertEquals(trainer, selectedTrainer);
     }
 
     @Test
@@ -75,9 +75,9 @@ public class TrainerServiceTest {
                 .firstName("Jane")
                 .lastName("Doe")
                 .isActive(true)
-                .specialization("Java")
+                .specialization(TrainingType.CARDIO)
                 .build();
-        when(trainerDAO.save(any(Trainer.class))).thenReturn(trainer);
+        when(trainerDAO.update(any(Trainer.class))).thenReturn(trainer);
 
         Trainer updatedTrainer = trainerService.updateTrainer(trainer);
 

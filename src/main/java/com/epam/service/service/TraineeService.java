@@ -7,10 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 
 @Service
 public class TraineeService {
@@ -26,36 +26,39 @@ public class TraineeService {
         this.userUsername = new UserUsername(traineeDAO, trainerDAO);
     }
 
+    @Transactional
     public Trainee createTrainee(Trainee trainee) {
         logger.info("Creating trainee for user: {} {}", trainee.getFirstName(), trainee.getLastName());
         String username = userUsername.generateUsername(trainee.getFirstName(), trainee.getLastName());
         String password = PasswordGenerator.generatePassword();
         trainee.setUsername(username);
         trainee.setPassword(password);
-        Trainee savedTrainee = traineeDAO.save(trainee);
-        logger.info("Trainee created successfully with username: {}", savedTrainee.getUsername());
-        return savedTrainee;
+        traineeDAO.save(trainee);
+        logger.info("Trainee created successfully with username: {}", trainee.getUsername());
+        return trainee;
     }
 
+    @Transactional
     public Trainee updateTrainee(Trainee trainee) {
         logger.info("Updating trainee with id: {}", trainee.getId());
-        return traineeDAO.save(trainee);
+        return traineeDAO.update(trainee);
     }
 
+    @Transactional
     public void deleteTrainee(long id) {
         logger.info("Deleting trainee with id: {}", id);
         traineeDAO.delete(id);
     }
 
-    public Optional<Trainee> selectTrainee(long id) {
+    @Transactional(readOnly = true)
+    public Trainee selectTrainee(long id) {
         logger.info("Selecting trainee with id: {}", id);
         return traineeDAO.findById(id);
     }
 
+    @Transactional(readOnly = true)
     public List<Trainee> selectAllTrainees() {
         logger.info("Selecting all trainees");
         return traineeDAO.findAll();
     }
-
-
 }

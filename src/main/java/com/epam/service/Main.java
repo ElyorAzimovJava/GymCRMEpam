@@ -39,15 +39,15 @@ public class Main {
                 .firstName("Jane")
                 .lastName("Doe")
                 .isActive(true)
-                .specialization("Java")
+                .specialization(TrainingType.CARDIO)
                 .build();
         trainer = trainingFacade.createTrainer(trainer);
         System.out.println("Created Trainer: " + trainer.getUsername());
 
         // Create a training
         Training training = Training.builder()
-                .traineeId(trainee.getId())
-                .trainerId(trainer.getId())
+                .trainee(trainee)
+                .trainer(trainer)
                 .trainingName("Java Training")
                 .trainingType(TrainingType.CARDIO)
                 .trainingDate(new Date())

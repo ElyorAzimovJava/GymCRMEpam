@@ -9,7 +9,6 @@ import com.epam.service.service.TrainingService;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Optional;
 
 @Component
 public class TrainingFacade {
@@ -36,7 +35,7 @@ public class TrainingFacade {
         traineeService.deleteTrainee(id);
     }
 
-    public Optional<Trainee> selectTrainee(long id) {
+    public Trainee selectTrainee(long id) {
         return traineeService.selectTrainee(id);
     }
 
@@ -52,7 +51,7 @@ public class TrainingFacade {
         return trainerService.updateTrainer(trainer);
     }
 
-    public Optional<Trainer> selectTrainer(long id) {
+    public Trainer selectTrainer(long id) {
         return trainerService.selectTrainer(id);
     }
 
@@ -64,7 +63,7 @@ public class TrainingFacade {
         return trainingService.createTraining(training);
     }
 
-    public Optional<Training> selectTraining(long id) {
+    public Training selectTraining(long id) {
         return trainingService.selectTraining(id);
     }
 
