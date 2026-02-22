@@ -23,6 +23,8 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    // TODO: double-check the DB schema attached to the task. For the fields that are not marked as `Optional`
+    //  you should add constraints to ensure integrity at the database level.
     private String firstName;
     private String lastName;
     // TODO: ensure uniqueness of username in the database
