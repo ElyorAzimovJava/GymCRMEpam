@@ -24,6 +24,7 @@ public class User {
     private long id;
     private String firstName;
     private String lastName;
+    // TODO: ensure uniqueness of username in the database
     private String username;
     private String password;
     private boolean isActive;

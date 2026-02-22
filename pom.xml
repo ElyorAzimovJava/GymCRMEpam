@@ -13,18 +13,19 @@
         <maven.compiler.release>21</maven.compiler.release>
 
         <!-- Versions -->
-        <spring.version>6.2.16</spring.version>
-        <hibernate.version>6.6.43.Final</hibernate.version>
+        <spring.version>7.0.5</spring.version>
+        <spring-data.version>4.0.3</spring-data.version>
+        <hibernate.version>7.2.5.Final</hibernate.version>
         <h2.version>2.4.240</h2.version>
         <slf4j.version>2.0.17</slf4j.version>
         <lombok.version>1.18.42</lombok.version>
 
         <!-- Testing -->
-        <junit.jupiter.version>5.12.0</junit.jupiter.version>
-        <mockito.version>5.16.0</mockito.version>
+        <junit.jupiter.version>6.0.3</junit.jupiter.version>
+        <mockito.version>5.21.0</mockito.version>
 
         <!-- Jakarta -->
-        <jakarta.annotation.version>2.1.1</jakarta.annotation.version>
+        <jakarta.annotation.version>3.0.0</jakarta.annotation.version>
         <jakarta.persistence.version>3.2.0</jakarta.persistence.version>
         <jakarta.transaction.version>2.0.1</jakarta.transaction.version>
     </properties>
@@ -40,6 +41,11 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-orm</artifactId>
             <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-jpa</artifactId>
+            <version>${spring-data.version}</version>
         </dependency>
 
         <!-- Hibernate -->
