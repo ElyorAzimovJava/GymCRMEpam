@@ -8,6 +8,14 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+// TODO:
+//  Implementation works correctly, but this DAO approach is considered low-level
+//  compared to modern Spring persistence practices.
+//  In most real projects repository layers are implemented using Spring Data JPA,
+//  which eliminates boilerplate and provides built-in CRUD.
+//  @Repository
+//  public interface TraineeRepository extends JpaRepository<Trainee, Long> {}
+//  2 lines above remove 95% boilerplate
 @Repository
 public class TraineeDAO implements BaseDAO<Trainee> {
 

@@ -30,6 +30,11 @@ public class TraineeServiceTest {
     @Mock
     private TrainerDAO trainerDAO;
 
+    // TODO:
+    //  Replace manual Mockito initialization with MockitoExtension.
+    //  Using @ExtendWith(MockitoExtension.class) removes boilerplate,
+    //  ensures proper lifecycle handling, enables strict stubbing validation,
+    //  and is the recommended approach for JUnit 5 tests
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);

@@ -14,6 +14,9 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
+// TODO:
+//  Please make sure a separate user table exists according to the task requirements.
+//  It should be @Entity instead of @MappedSuperClass
 @MappedSuperclass
 public class User {
     @Id

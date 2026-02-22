@@ -12,6 +12,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+// TODO:
+//   Here and in other services
+//  1. Unused imports (Use `Inspect Code` -> `Imports` to fix them all)
+//  2. @Slf4j
+//  3. @RequiredArgsConstructor
 @Service
 public class TraineeService {
 
