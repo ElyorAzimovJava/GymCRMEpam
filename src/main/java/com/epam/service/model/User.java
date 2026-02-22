@@ -17,6 +17,7 @@ import lombok.experimental.SuperBuilder;
 // TODO:
 //  Please make sure a separate user table exists according to the task requirements.
 //  It should be @Entity instead of @MappedSuperClass
+//  Then you can use OneToOne relationship on Trainer and Trainee to link them to the User table
 @MappedSuperclass
 public class User {
     @Id
