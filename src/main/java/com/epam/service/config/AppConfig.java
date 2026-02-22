@@ -16,6 +16,9 @@ import java.util.Properties;
 @ComponentScan("com.epam.service")
 @PropertySource("classpath:application.properties")
 @EnableTransactionManagement
+// TODO:
+//  Please update your configuration to match the latest libraries versions we agreed to use
+//  Your current config still contains legacy patterns and should be modernized
 public class AppConfig {
     @Bean
     public DataSource dataSource() {
