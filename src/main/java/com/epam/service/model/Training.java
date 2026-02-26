@@ -27,11 +27,12 @@ public class Training  implements Serializable {
     @JoinColumn(name = "trainer_id")
     private Trainer trainer;
 
+    @Column(nullable = false)
     private String trainingName;
 
     @Enumerated(EnumType.STRING)
     private TrainingType trainingType;
-
+    @Column(nullable = false)
     private Date trainingDate;
     private int trainingDuration;
 

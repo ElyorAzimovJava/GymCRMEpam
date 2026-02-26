@@ -16,6 +16,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 public class Trainee extends User implements Serializable {
+    @Column(nullable = false)
     private Date dateOfBirth;
     private String address;
 
