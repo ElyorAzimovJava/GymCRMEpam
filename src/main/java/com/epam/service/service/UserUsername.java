@@ -6,6 +6,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
+// TODO:
+//  [Optional]
+//  Current class name might not be very descriptive. Consider renaming it to something like "UsernameGenerator" for better clarity.
 public class UserUsername {
     private final UserRepository userRepository;
 
