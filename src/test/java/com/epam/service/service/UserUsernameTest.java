@@ -1,67 +1,47 @@
 package com.epam.service.service;
 
-import com.epam.service.dao.TraineeDAO;
-import com.epam.service.dao.TrainerDAO;
-import com.epam.service.model.Trainee;
-import com.epam.service.model.Trainer;
-import com.epam.service.service.UserUsername;
-import org.junit.jupiter.api.BeforeEach;
+import com.epam.service.dao.UserRepository;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-public class UserUsernameTest {
+@ExtendWith(MockitoExtension.class)
+class UserUsernameTest {
 
+    @InjectMocks
     private UserUsername userUsername;
 
     @Mock
-    private TraineeDAO traineeDAO;
-
-    @Mock
-    private TrainerDAO trainerDAO;
-
-    @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
-        userUsername = new UserUsername(traineeDAO, trainerDAO);
-    }
+    private UserRepository userRepository;
 
     @Test
-    public void testGenerateUsername() {
-        when(traineeDAO.findAll()).thenReturn(new ArrayList<>());
-        when(trainerDAO.findAll()).thenReturn(new ArrayList<>());
+    void testGenerateUsername() {
+        when(userRepository.existsByUsername("john.doe")).thenReturn(false);
 
         String username = userUsername.generateUsername("John", "Doe");
         assertEquals("John.Doe", username);
     }
 
     @Test
-    public void testGenerateUsernameWhenTaken() {
-        List<Trainee> trainees = new ArrayList<>();
-        trainees.add(Trainee.builder().username("John.Doe").build());
-        when(traineeDAO.findAll()).thenReturn(trainees);
-        when(trainerDAO.findAll()).thenReturn(new ArrayList<>());
+    void testGenerateUsernameWhenTaken() {
+        when(userRepository.existsByUsername("john.doe")).thenReturn(true);
+        when(userRepository.existsByUsername("john.doe1")).thenReturn(false);
 
         String username = userUsername.generateUsername("John", "Doe");
         assertEquals("John.Doe1", username);
     }
 
     @Test
-    public void testGenerateUsernameWhenTakenMultipleTimes() {
-        List<Trainee> trainees = new ArrayList<>();
-        trainees.add(Trainee.builder().username("John.Doe").build());
-        trainees.add(Trainee.builder().username("John.Doe1").build());
-        when(traineeDAO.findAll()).thenReturn(trainees);
-
-        List<Trainer> trainers = new ArrayList<>();
-        trainers.add(Trainer.builder().username("John.Doe2").build());
-        when(trainerDAO.findAll()).thenReturn(trainers);
+    void testGenerateUsernameWhenTakenMultipleTimes() {
+        when(userRepository.existsByUsername("john.doe")).thenReturn(true);
+        when(userRepository.existsByUsername("john.doe1")).thenReturn(true);
+        when(userRepository.existsByUsername("john.doe2")).thenReturn(true);
+        when(userRepository.existsByUsername("john.doe3")).thenReturn(false);
 
         String username = userUsername.generateUsername("John", "Doe");
         assertEquals("John.Doe3", username);
