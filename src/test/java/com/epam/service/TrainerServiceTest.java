@@ -1,9 +1,12 @@
 package com.epam.service;
 
 import com.epam.service.dao.TrainerRepository;
+import com.epam.service.model.Trainee;
 import com.epam.service.model.Trainer;
 import com.epam.service.model.TrainingType;
+import com.epam.service.service.TraineeService;
 import com.epam.service.service.TrainerService;
+import com.epam.service.service.UserService;
 import com.epam.service.service.UserUsername;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +40,12 @@ class TrainerServiceTest {
 
     @Mock
     private UserUsername userUsername;
+
+    @Mock
+    private UserService userService;
+
+    @Mock
+    private TraineeService traineeService;
 
     @Test
     void testCreateTrainer() {
@@ -116,5 +126,81 @@ class TrainerServiceTest {
         assertNotNull(trainers);
         assertEquals(1, trainers.size());
         verify(trainerRepository, times(1)).findAll();
+    }
+
+    @Test
+    void testSelectTrainerByUsername() {
+        Trainer trainer = Trainer.builder()
+                .id(1L)
+                .username("Jane.Doe")
+                .build();
+        when(trainerRepository.findByUsername("Jane.Doe")).thenReturn(Optional.of(trainer));
+
+        Trainer selectedTrainer = trainerService.selectTrainerByUsername("Jane.Doe");
+
+        assertEquals(trainer, selectedTrainer);
+        verify(trainerRepository, times(1)).findByUsername("Jane.Doe");
+    }
+
+    @Test
+    void testSelectTrainerByUsernameNotFound() {
+        when(trainerRepository.findByUsername("Jane.Doe")).thenReturn(Optional.empty());
+        assertThrows(RuntimeException.class, () -> trainerService.selectTrainerByUsername("Jane.Doe"));
+        verify(trainerRepository, times(1)).findByUsername("Jane.Doe");
+    }
+
+    @Test
+    void testChangeTrainerPassword() {
+        doNothing().when(userService).changePassword("Jane.Doe", "newPassword");
+        trainerService.changeTrainerPassword("Jane.Doe", "newPassword");
+        verify(userService, times(1)).changePassword("Jane.Doe", "newPassword");
+    }
+
+    @Test
+    void testActivateTrainer() {
+        Trainer trainer = Trainer.builder()
+                .id(1L)
+                .username("Jane.Doe").isActive(false)
+                .build();
+        when(trainerRepository.findByUsername("Jane.Doe")).thenReturn(Optional.of(trainer));
+        when(trainerRepository.save(any(Trainer.class))).thenReturn(trainer);
+
+        trainerService.activateTrainer("Jane.Doe");
+
+        assertEquals(true, trainer.isActive());
+        verify(trainerRepository, times(1)).save(trainer);
+    }
+
+    @Test
+    void testDeactivateTrainer() {
+        Trainer trainer = Trainer.builder()
+                .id(1L)
+                .username("Jane.Doe").isActive(true)
+                .build();
+        when(trainerRepository.findByUsername("Jane.Doe")).thenReturn(Optional.of(trainer));
+        when(trainerRepository.save(any(Trainer.class))).thenReturn(trainer);
+
+        trainerService.deactivateTrainer("Jane.Doe");
+
+        assertEquals(false, trainer.isActive());
+        verify(trainerRepository, times(1)).save(trainer);
+    }
+
+    @Test
+    void testGetUnassignedTrainers() {
+        Trainer assignedTrainer = Trainer.builder().id(1L).build();
+        Trainer unassignedTrainer = Trainer.builder().id(2L).build();
+        Trainee trainee = Trainee.builder()
+                .id(1L)
+                .username("John.Doe")
+                .trainers(Collections.singletonList(assignedTrainer))
+                .build();
+        when(traineeService.selectTraineeByUsername("John.Doe")).thenReturn(trainee);
+        when(trainerRepository.findAll()).thenReturn(Arrays.asList(assignedTrainer, unassignedTrainer));
+
+        List<Trainer> unassignedTrainers = trainerService.getUnassignedTrainers("John.Doe");
+
+        assertEquals(1, unassignedTrainers.size());
+        assertEquals(unassignedTrainer, unassignedTrainers.get(0));
     }
 }
