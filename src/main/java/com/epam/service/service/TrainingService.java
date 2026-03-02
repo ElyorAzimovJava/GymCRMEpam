@@ -40,6 +40,12 @@ public class TrainingService {
         trainingRepository.deleteById(id);
     }
 
+
+    // TODO:
+    //  Yes, you did filtering with streams, now how to do it via the database?
+    //  You already filter by username `findByTraineeUsername` meaning that Spring Data JPA can reach nested training.trainee.username.
+    //  In this case it can also reach training.trainer.firstName and of course Training own fields like trainingDate and trainingType.
+    //  Hint: use "And" to chain multiple conditions and "Between" for date range
     @Transactional(readOnly = true)
     public List<Training> getTraineeTrainings(String username, Date fromDate, Date toDate, String trainerName, TrainingType trainingType) {
         log.info("Getting trainings for trainee: {}", username);
