@@ -19,7 +19,7 @@ import java.util.Properties;
 @PropertySource("classpath:application.properties")
 @EnableTransactionManagement
 // TODO:
-//  Now, when we use real repositories the standard package name should be 'repository' instead of 'dao'
+//  Now, when we use Hibernate and JPA the standard package name should be 'repository' instead of 'dao'
 @EnableJpaRepositories("com.epam.service.dao")
 public class AppConfig {
     @Bean
