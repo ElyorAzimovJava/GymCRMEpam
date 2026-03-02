@@ -4,7 +4,6 @@ import com.epam.service.dao.TraineeRepository;
 import com.epam.service.dao.TrainerRepository;
 import com.epam.service.model.Trainee;
 import com.epam.service.model.Trainer;
-import com.epam.service.model.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

@@ -18,6 +18,8 @@ import java.util.Properties;
 @ComponentScan("com.epam.service")
 @PropertySource("classpath:application.properties")
 @EnableTransactionManagement
+// TODO:
+//  Now, when we use real repositories the standard package name should be 'repository' instead of 'dao'
 @EnableJpaRepositories("com.epam.service.dao")
 public class AppConfig {
     @Bean

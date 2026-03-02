@@ -14,7 +14,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 @Entity
-public class Training  implements Serializable {
+public class Training implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -34,6 +34,10 @@ public class Training  implements Serializable {
     private TrainingType trainingType;
     @Column(nullable = false)
     private Date trainingDate;
+    // TODO:
+    //  Still not sure is it minutes, seconds, hours?
+    //  Here is a good place for a comment to clarify for everyone who's reading your code
+    //  Or rename the variable
     private int trainingDuration;
 
 }
