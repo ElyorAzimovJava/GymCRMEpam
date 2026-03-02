@@ -36,6 +36,10 @@ public class AppConfig {
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean entityManagerFactory = new LocalContainerEntityManagerFactoryBean();
         entityManagerFactory.setDataSource(dataSource());
+        // TODO:
+        //  Since we are using Hibernate and JPA it is conventional to name the package `entity`
+        //  instead of `model`, since these classes are persistence entities.
+        //  The `model` package name is typically used for DTOs or API models.
         entityManagerFactory.setPackagesToScan("com.epam.service.model");
         entityManagerFactory.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
         entityManagerFactory.setJpaProperties(hibernateProperties());
