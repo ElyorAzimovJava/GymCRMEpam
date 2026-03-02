@@ -85,6 +85,9 @@ public class TrainerService {
         trainerRepository.save(trainer);
     }
 
+    // TODO:
+    //  Yes, streams work, and for the db level solution it can be:
+    //  findByTraineesNotContaining(Trainee trainee);
     @Transactional(readOnly = true)
     public List<Trainer> getUnassignedTrainers(String traineeUsername) {
         log.info("Getting unassigned trainers for trainee: {}", traineeUsername);
