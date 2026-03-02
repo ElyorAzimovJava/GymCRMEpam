@@ -1,3 +1,7 @@
+// TODO:
+//  Since we are using Hibernate and JPA it is conventional to name the package `entity`
+//  instead of `model`, since these classes are persistence entities.
+//  The `model` package name is typically used for DTOs or API models.
 package com.epam.service.model;
 
 import jakarta.persistence.*;
