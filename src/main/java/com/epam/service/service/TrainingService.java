@@ -43,6 +43,11 @@ public class TrainingService {
 
     // TODO:
     //  Yes, you did filtering with streams, now how to do it via the database?
+    //  If any of filters can be null (most often it is true), than it is better to use:
+    //  1) @Query + JPQL + condition :fromDate is null or t.date >= :fromDate
+    //  2) CriteriaAPI JpaSpecificationExecutor which allows to build predicates conditionally
+    //  ---
+    //  If our contract requires that all filters must be provided, then this option:
     //  You already filter by username `findByTraineeUsername` meaning that Spring Data JPA can reach nested training.trainee.username.
     //  In this case it can also reach training.trainer.firstName and of course Training own fields like trainingDate and trainingType.
     //  Hint: use "And" to chain multiple conditions and "Between" for date range
