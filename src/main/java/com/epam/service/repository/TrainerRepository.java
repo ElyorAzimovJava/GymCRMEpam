@@ -1,7 +1,6 @@
-package com.epam.service.dao;
+package com.epam.service.repository;
 
-import com.epam.service.model.Trainer;
-import com.epam.service.model.User;
+import com.epam.service.entity.Trainer;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

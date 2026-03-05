@@ -1,10 +1,10 @@
 package com.epam.service;
 
-import com.epam.service.dao.TrainingRepository;
-import com.epam.service.model.Trainee;
-import com.epam.service.model.Trainer;
-import com.epam.service.model.Training;
-import com.epam.service.model.TrainingType;
+import com.epam.service.repository.TrainingRepository;
+import com.epam.service.entity.Trainee;
+import com.epam.service.entity.Trainer;
+import com.epam.service.entity.Training;
+import com.epam.service.entity.TrainingType;
 import com.epam.service.service.TrainingService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

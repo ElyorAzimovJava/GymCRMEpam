@@ -1,4 +1,4 @@
-package com.epam.service.model;
+package com.epam.service.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -17,7 +17,7 @@ import lombok.experimental.SuperBuilder;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     @Column(nullable = false)
     private String firstName;
     @Column(nullable = false)
@@ -26,6 +26,6 @@ public class User {
     private String username;
     @Column(nullable = false)
     private String password;
-    private boolean isActive;
+    private boolean isActive = true;
 
 }

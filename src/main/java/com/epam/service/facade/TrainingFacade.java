@@ -1,8 +1,8 @@
 package com.epam.service.facade;
 
-import com.epam.service.model.Trainee;
-import com.epam.service.model.Trainer;
-import com.epam.service.model.Training;
+import com.epam.service.entity.Trainee;
+import com.epam.service.entity.Trainer;
+import com.epam.service.entity.Training;
 import com.epam.service.service.TraineeService;
 import com.epam.service.service.TrainerService;
 import com.epam.service.service.TrainingService;

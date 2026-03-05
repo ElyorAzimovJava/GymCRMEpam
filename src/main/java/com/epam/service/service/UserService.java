@@ -1,7 +1,7 @@
 package com.epam.service.service;
 
-import com.epam.service.dao.UserRepository;
-import com.epam.service.model.User;
+import com.epam.service.repository.UserRepository;
+import com.epam.service.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

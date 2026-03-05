@@ -1,8 +1,8 @@
 package com.epam.service.service;
 
-import com.epam.service.dao.TrainerRepository;
-import com.epam.service.model.Trainee;
-import com.epam.service.model.Trainer;
+import com.epam.service.repository.TrainerRepository;
+import com.epam.service.entity.Trainee;
+import com.epam.service.entity.Trainer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,13 +18,13 @@ public class TrainerService {
 
     private final TrainerRepository trainerRepository;
     private final UserService userService;
-    private final UserUsername userUsername;
+    private final UsernameGenerator usernameGenerator;
     private final TraineeService traineeService;
 
     @Transactional
     public Trainer createTrainer(Trainer trainer) {
         log.info("Creating trainer for user: {} {}", trainer.getFirstName(), trainer.getLastName());
-        String username = userUsername.generateUsername(trainer.getFirstName(), trainer.getLastName());
+        String username = usernameGenerator.generateUsername(trainer.getFirstName(), trainer.getLastName());
         String password = PasswordGenerator.generatePassword();
         trainer.setUsername(username);
         trainer.setPassword(password);

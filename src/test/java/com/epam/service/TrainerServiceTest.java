@@ -1,13 +1,13 @@
 package com.epam.service;
 
-import com.epam.service.dao.TrainerRepository;
-import com.epam.service.model.Trainee;
-import com.epam.service.model.Trainer;
-import com.epam.service.model.TrainingType;
+import com.epam.service.repository.TrainerRepository;
+import com.epam.service.entity.Trainee;
+import com.epam.service.entity.Trainer;
+import com.epam.service.entity.TrainingType;
 import com.epam.service.service.TraineeService;
 import com.epam.service.service.TrainerService;
 import com.epam.service.service.UserService;
-import com.epam.service.service.UserUsername;
+import com.epam.service.service.UsernameGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -39,7 +39,7 @@ class TrainerServiceTest {
     private TrainerRepository trainerRepository;
 
     @Mock
-    private UserUsername userUsername;
+    private UsernameGenerator usernameGenerator;
 
     @Mock
     private UserService userService;
@@ -55,7 +55,7 @@ class TrainerServiceTest {
                 .isActive(true)
                 .specialization(TrainingType.CARDIO)
                 .build();
-        when(userUsername.generateUsername(anyString(), anyString())).thenReturn("Jane.Doe");
+        when(usernameGenerator.generateUsername(anyString(), anyString())).thenReturn("Jane.Doe");
         when(trainerRepository.save(any(Trainer.class))).thenReturn(trainer);
 
         Trainer createdTrainer = trainerService.createTrainer(trainer);

@@ -2,10 +2,10 @@ package com.epam.service;
 
 import com.epam.service.config.AppConfig;
 import com.epam.service.facade.TrainingFacade;
-import com.epam.service.model.Trainee;
-import com.epam.service.model.Trainer;
-import com.epam.service.model.Training;
-import com.epam.service.model.TrainingType;
+import com.epam.service.entity.Trainee;
+import com.epam.service.entity.Trainer;
+import com.epam.service.entity.Training;
+import com.epam.service.entity.TrainingType;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 

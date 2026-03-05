@@ -1,7 +1,7 @@
 package com.epam.service.service;
 
-import com.epam.service.dao.TrainingRepository;
-import com.epam.service.model.Training;
+import com.epam.service.repository.TrainingRepository;
+import com.epam.service.entity.Training;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
-import com.epam.service.model.TrainingType;
+import com.epam.service.entity.TrainingType;
 
 import java.util.Date;
 
@@ -43,24 +43,19 @@ public class TrainingService {
     @Transactional(readOnly = true)
     public List<Training> getTraineeTrainings(String username, Date fromDate, Date toDate, String trainerName, TrainingType trainingType) {
         log.info("Getting trainings for trainee: {}", username);
-        List<Training> trainings = trainingRepository.findByTraineeUsername(username);
-        return trainings.stream()
+        return trainingRepository.findTrainerTrainingsByCriteria(username,fromDate,toDate,trainerName,trainingType);
+/*        return trainings.stream()
                 .filter(t -> fromDate == null || t.getTrainingDate().after(fromDate))
                 .filter(t -> toDate == null || t.getTrainingDate().before(toDate))
                 .filter(t -> trainerName == null || t.getTrainer().getFirstName().equals(trainerName))
                 .filter(t -> trainingType == null || t.getTrainingType().equals(trainingType))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList());*/
     }
 
     @Transactional(readOnly = true)
     public List<Training> getTrainerTrainings(String username, Date fromDate, Date toDate, String traineeName) {
         log.info("Getting trainings for trainer: {}", username);
-        List<Training> trainings = trainingRepository.findByTrainerUsername(username);
-        return trainings.stream()
-                .filter(t -> fromDate == null || t.getTrainingDate().after(fromDate))
-                .filter(t -> toDate == null || t.getTrainingDate().before(toDate))
-                .filter(t -> traineeName == null || t.getTrainee().getFirstName().equals(traineeName))
-                .collect(Collectors.toList());
+        return trainingRepository.findTraineeTrainingsByCriteria(username, fromDate, toDate, traineeName);
     }
 
     @Transactional(readOnly = true)

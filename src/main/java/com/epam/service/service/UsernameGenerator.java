@@ -1,12 +1,12 @@
 package com.epam.service.service;
 
-import com.epam.service.dao.UserRepository;
+import com.epam.service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class UserUsername {
+public class UsernameGenerator {
     private final UserRepository userRepository;
 
     public String generateUsername(String firstName, String lastName) {

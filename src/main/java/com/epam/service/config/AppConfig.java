@@ -18,7 +18,7 @@ import java.util.Properties;
 @ComponentScan("com.epam.service")
 @PropertySource("classpath:application.properties")
 @EnableTransactionManagement
-@EnableJpaRepositories("com.epam.service.dao")
+@EnableJpaRepositories("com.epam.service.repository")
 public class AppConfig {
     @Bean
     public DataSource dataSource() {
@@ -34,7 +34,7 @@ public class AppConfig {
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean entityManagerFactory = new LocalContainerEntityManagerFactoryBean();
         entityManagerFactory.setDataSource(dataSource());
-        entityManagerFactory.setPackagesToScan("com.epam.service.model");
+        entityManagerFactory.setPackagesToScan("com.epam.service.entity");
         entityManagerFactory.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
         entityManagerFactory.setJpaProperties(hibernateProperties());
         return entityManagerFactory;

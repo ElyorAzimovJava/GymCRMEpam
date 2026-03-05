@@ -1,12 +1,12 @@
 package com.epam.service;
 
-import com.epam.service.dao.TraineeRepository;
-import com.epam.service.dao.TrainerRepository;
-import com.epam.service.model.Trainee;
-import com.epam.service.model.Trainer;
+import com.epam.service.repository.TraineeRepository;
+import com.epam.service.repository.TrainerRepository;
+import com.epam.service.entity.Trainee;
+import com.epam.service.entity.Trainer;
 import com.epam.service.service.TraineeService;
 import com.epam.service.service.UserService;
-import com.epam.service.service.UserUsername;
+import com.epam.service.service.UsernameGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -35,7 +35,7 @@ class TraineeServiceTest {
     private TraineeRepository traineeRepository;
 
     @Mock
-    private UserUsername userUsername;
+    private UsernameGenerator usernameGenerator;
 
     @Mock
     private UserService userService;
@@ -52,7 +52,7 @@ class TraineeServiceTest {
                 .dateOfBirth(new Date())
                 .address("123 Main St")
                 .build();
-        when(userUsername.generateUsername(anyString(), anyString())).thenReturn("John.Doe");
+        when(usernameGenerator.generateUsername(anyString(), anyString())).thenReturn("John.Doe");
         when(traineeRepository.save(any(Trainee.class))).thenReturn(trainee);
 
         Trainee createdTrainee = traineeService.createTrainee(trainee);

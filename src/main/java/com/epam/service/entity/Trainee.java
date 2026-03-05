@@ -1,4 +1,4 @@
-package com.epam.service.model;
+package com.epam.service.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
