@@ -89,6 +89,9 @@ public class TrainerService {
     public List<Trainer> getUnassignedTrainers(String traineeUsername) {
         log.info("Getting unassigned trainers for trainee: {}", traineeUsername);
         Trainee trainee = traineeService.selectTraineeByUsername(traineeUsername);
+        // TODO:
+        //  [Optional]
+        //  Could also be done via db level with trainerRepository.findAllByTraineesNotContaining(Trainee trainee)
         List<Trainer> allTrainers = trainerRepository.findAll();
         return allTrainers.stream()
                 .filter(trainer -> !trainee.getTrainers().contains(trainer))
