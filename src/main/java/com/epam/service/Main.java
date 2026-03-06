@@ -9,6 +9,9 @@ import com.epam.service.entity.TrainingType;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Date;
 
 public class Main {
@@ -51,7 +54,7 @@ public class Main {
                 .trainingName("Java Training")
                 .trainingType(TrainingType.CARDIO)
                 .trainingDate(new Date())
-                .trainingDuration(60)
+                .trainingDuration(Duration.ofMinutes(90))
                 .build();
         training = trainingFacade.createTraining(training);
         System.out.println("Created Training: " + training.getTrainingName());

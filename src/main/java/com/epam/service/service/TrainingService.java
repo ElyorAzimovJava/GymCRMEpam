@@ -53,9 +53,9 @@ public class TrainingService {
     }
 
     @Transactional(readOnly = true)
-    public List<Training> getTrainerTrainings(String username, Date fromDate, Date toDate, String traineeName) {
+    public List<Training> getTrainerTrainings(String username, Date fromDate, Date toDate, String traineeName,TrainingType trainingType) {
         log.info("Getting trainings for trainer: {}", username);
-        return trainingRepository.findTraineeTrainingsByCriteria(username, fromDate, toDate, traineeName);
+        return trainingRepository.findTraineeTrainingsByCriteria(username, fromDate, toDate, traineeName,trainingType);
     }
 
     @Transactional(readOnly = true)

@@ -1,15 +1,16 @@
 package com.epam.service.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Date;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -36,6 +37,6 @@ public class Training implements Serializable {
     private Date trainingDate;
     // TODO:
     //  please specify which units this field is in (hours, minutes, seconds, etc)
-    private int trainingDuration;
+    private Duration trainingDuration;
 
 }

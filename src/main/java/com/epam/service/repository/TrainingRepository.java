@@ -37,7 +37,9 @@ public interface TrainingRepository extends JpaRepository<Training, Long> {
             @Param("username") String username,
             @Param("fromDate") Date fromDate,
             @Param("toDate") Date toDate,
-            @Param("trainerName") String trainerName
+            @Param("trainerName") String trainerName,
+            @Param("trainingType") TrainingType trainingType
+
     );
 
 }
