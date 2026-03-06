@@ -34,6 +34,8 @@ public class Training implements Serializable {
     private TrainingType trainingType;
     @Column(nullable = false)
     private Date trainingDate;
+    // TODO:
+    //  please specify which units this field is in (hours, minutes, seconds, etc)
     private int trainingDuration;
 
 }
