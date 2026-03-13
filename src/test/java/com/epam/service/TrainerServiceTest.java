@@ -1,5 +1,6 @@
 package com.epam.service;
 
+import com.epam.service.entity.User;
 import com.epam.service.repository.TrainerRepository;
 import com.epam.service.entity.Trainee;
 import com.epam.service.entity.Trainer;
@@ -49,20 +50,23 @@ class TrainerServiceTest {
 
     @Test
     void testCreateTrainer() {
-        Trainer trainer = Trainer.builder()
-                .firstName("Jane")
-                .lastName("Doe")
-                .isActive(true)
-                .specialization(TrainingType.CARDIO)
-                .build();
+        User user = new User();
+        user.setFirstName("Jane");
+        user.setLastName("Doe");
+        user.setActive(true);
+
+        Trainer trainer = new Trainer();
+        trainer.setUser(user);
+        trainer.setSpecialization(TrainingType.CARDIO);
+
         when(usernameGenerator.generateUsername(anyString(), anyString())).thenReturn("Jane.Doe");
         when(trainerRepository.save(any(Trainer.class))).thenReturn(trainer);
 
         Trainer createdTrainer = trainerService.createTrainer(trainer);
 
         assertNotNull(createdTrainer);
-        assertEquals("Jane.Doe", createdTrainer.getUsername());
-        assertNotNull(createdTrainer.getPassword());
+        assertEquals("Jane.Doe", createdTrainer.getUser().getUsername());
+        assertNotNull(createdTrainer.getUser().getPassword());
         verify(trainerRepository, times(1)).save(trainer);
     }
 
@@ -70,11 +74,12 @@ class TrainerServiceTest {
     void testSelectTrainer() {
         Trainer trainer = Trainer.builder()
                 .id(1L)
-                .firstName("Jane")
-                .lastName("Doe")
-                .username("Jane.Doe")
-                .password("password")
-                .isActive(true)
+                .user(User.builder()
+                        .firstName("Jane")
+                        .lastName("Doe")
+                        .username("Jane.Doe")
+                        .password("password")
+                        .isActive(true).build())
                 .specialization(TrainingType.CARDIO)
                 .build();
         when(trainerRepository.findById(1L)).thenReturn(Optional.of(trainer));
@@ -96,10 +101,12 @@ class TrainerServiceTest {
     void testUpdateTrainer() {
         Trainer trainer = Trainer.builder()
                 .id(1L)
-                .firstName("Jane")
-                .lastName("Doe")
-                .isActive(true)
-                .specialization(TrainingType.CARDIO)
+                .user(User.builder()
+                        .firstName("Jane")
+                        .lastName("Doe")
+                        .username("Jane.Doe")
+                        .password("password")
+                        .isActive(true).build())
                 .build();
         when(trainerRepository.save(any(Trainer.class))).thenReturn(trainer);
 
@@ -130,71 +137,98 @@ class TrainerServiceTest {
 
     @Test
     void testSelectTrainerByUsername() {
-        Trainer trainer = Trainer.builder()
-                .id(1L)
-                .username("Jane.Doe")
-                .build();
-        when(trainerRepository.findByUsername("Jane.Doe")).thenReturn(Optional.of(trainer));
+        User user = new User();
+        user.setUsername("Jane.Doe");
+
+        Trainer trainer = new Trainer();
+        trainer.setId(1L);
+        trainer.setUser(user);
+
+        when(trainerRepository.findByUserUsername("Jane.Doe")).thenReturn(Optional.of(trainer));
 
         Trainer selectedTrainer = trainerService.selectTrainerByUsername("Jane.Doe");
 
         assertEquals(trainer, selectedTrainer);
-        verify(trainerRepository, times(1)).findByUsername("Jane.Doe");
+        verify(trainerRepository, times(1)).findByUserUsername("Jane.Doe");
     }
 
     @Test
     void testSelectTrainerByUsernameNotFound() {
-        when(trainerRepository.findByUsername("Jane.Doe")).thenReturn(Optional.empty());
+        when(trainerRepository.findByUserUsername("Jane.Doe")).thenReturn(Optional.empty());
         assertThrows(RuntimeException.class, () -> trainerService.selectTrainerByUsername("Jane.Doe"));
-        verify(trainerRepository, times(1)).findByUsername("Jane.Doe");
+        verify(trainerRepository, times(1)).findByUserUsername("Jane.Doe");
     }
 
     @Test
     void testChangeTrainerPassword() {
-        doNothing().when(userService).changePassword("Jane.Doe", "newPassword");
-        trainerService.changeTrainerPassword("Jane.Doe", "newPassword");
-        verify(userService, times(1)).changePassword("Jane.Doe", "newPassword");
+        doNothing().when(userService).changePassword("Jane.Doe", "oldPassword", "newPassword");
+        trainerService.changeTrainerPassword("Jane.Doe", "oldPassword", "newPassword");
+        verify(userService, times(1)).changePassword("Jane.Doe", "oldPassword", "newPassword");
     }
 
     @Test
     void testActivateTrainer() {
-        Trainer trainer = Trainer.builder()
-                .id(1L)
-                .username("Jane.Doe").isActive(false)
-                .build();
-        when(trainerRepository.findByUsername("Jane.Doe")).thenReturn(Optional.of(trainer));
+        User user = new User();
+        user.setUsername("Jane.Doe");
+        user.setActive(false);
+
+        Trainer trainer = new Trainer();
+        trainer.setId(1L);
+        trainer.setUser(user);
+
+        when(trainerRepository.findByUserUsername("Jane.Doe")).thenReturn(Optional.of(trainer));
         when(trainerRepository.save(any(Trainer.class))).thenReturn(trainer);
 
         trainerService.activateTrainer("Jane.Doe");
 
-        assertEquals(true, trainer.isActive());
+        assertEquals(true, trainer.getUser().isActive());
         verify(trainerRepository, times(1)).save(trainer);
     }
 
     @Test
     void testDeactivateTrainer() {
-        Trainer trainer = Trainer.builder()
-                .id(1L)
-                .username("Jane.Doe").isActive(true)
-                .build();
-        when(trainerRepository.findByUsername("Jane.Doe")).thenReturn(Optional.of(trainer));
+        User user = new User();
+        user.setUsername("Jane.Doe");
+        user.setActive(true);
+
+        Trainer trainer = new Trainer();
+        trainer.setId(1L);
+        trainer.setUser(user);
+
+        when(trainerRepository.findByUserUsername("Jane.Doe")).thenReturn(Optional.of(trainer));
         when(trainerRepository.save(any(Trainer.class))).thenReturn(trainer);
 
         trainerService.deactivateTrainer("Jane.Doe");
 
-        assertEquals(false, trainer.isActive());
+        assertEquals(false, trainer.getUser().isActive());
         verify(trainerRepository, times(1)).save(trainer);
     }
 
     @Test
     void testGetUnassignedTrainers() {
-        Trainer assignedTrainer = Trainer.builder().id(1L).build();
-        Trainer unassignedTrainer = Trainer.builder().id(2L).build();
-        Trainee trainee = Trainee.builder()
-                .id(1L)
-                .username("John.Doe")
-                .trainers(Collections.singletonList(assignedTrainer))
-                .build();
+        User traineeUser = new User();
+        traineeUser.setUsername("John.Doe");
+
+        Trainee trainee = new Trainee();
+        trainee.setId(1L);
+        trainee.setUser(traineeUser);
+
+        User assignedTrainerUser = new User();
+        assignedTrainerUser.setUsername("assigned.trainer");
+
+        Trainer assignedTrainer = new Trainer();
+        assignedTrainer.setId(1L);
+        assignedTrainer.setUser(assignedTrainerUser);
+
+        trainee.setTrainers(Collections.singletonList(assignedTrainer));
+
+        User unassignedTrainerUser = new User();
+        unassignedTrainerUser.setUsername("unassigned.trainer");
+
+        Trainer unassignedTrainer = new Trainer();
+        unassignedTrainer.setId(2L);
+        unassignedTrainer.setUser(unassignedTrainerUser);
+
         when(traineeService.selectTraineeByUsername("John.Doe")).thenReturn(trainee);
         when(trainerRepository.findAll()).thenReturn(Arrays.asList(assignedTrainer, unassignedTrainer));
 

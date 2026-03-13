@@ -1,33 +1,35 @@
 package com.epam.service.service;
 
-import com.epam.service.repository.UserRepository;
 import com.epam.service.entity.User;
+import com.epam.service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
 
-    @Transactional
-    public void changePassword(String username, String newPassword) {
-        log.info("Changing password for user: {}", username);
+    @Transactional(readOnly = true)
+    public boolean checkCredentials(String username, String password) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
-        user.setPassword(newPassword);
-        userRepository.save(user);
+        return user.getPassword().equals(password);
     }
 
-    @Transactional(readOnly = true)
-    public boolean checkPassword(String username, String password) {
-        log.info("Checking password for user: {}", username);
-        return userRepository.findByUsername(username)
-                .map(user -> user.getPassword().equals(password))
-                .orElse(false);
+    @Transactional
+    public void changePassword(String username, String oldPassword, String newPassword) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
+
+        // In a real application, you would use a password encoder
+        if (!user.getPassword().equals(oldPassword)) {
+            throw new IllegalArgumentException("Invalid old password");
+        }
+
+        user.setPassword(newPassword);
+        userRepository.save(user);
     }
 }

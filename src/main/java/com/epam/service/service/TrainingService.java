@@ -43,7 +43,7 @@ public class TrainingService {
     @Transactional(readOnly = true)
     public List<Training> getTraineeTrainings(String username, Date fromDate, Date toDate, String trainerName, TrainingType trainingType) {
         log.info("Getting trainings for trainee: {}", username);
-        return trainingRepository.findTrainerTrainingsByCriteria(username,fromDate,toDate,trainerName,trainingType);
+        return trainingRepository.findTraineeTrainingsByCriteria(username, fromDate, toDate, trainerName, trainingType);
 /*        return trainings.stream()
                 .filter(t -> fromDate == null || t.getTrainingDate().after(fromDate))
                 .filter(t -> toDate == null || t.getTrainingDate().before(toDate))
@@ -55,7 +55,7 @@ public class TrainingService {
     @Transactional(readOnly = true)
     public List<Training> getTrainerTrainings(String username, Date fromDate, Date toDate, String traineeName,TrainingType trainingType) {
         log.info("Getting trainings for trainer: {}", username);
-        return trainingRepository.findTraineeTrainingsByCriteria(username, fromDate, toDate, traineeName,trainingType);
+        return trainingRepository.findTrainerTrainingsByCriteria(username, fromDate, toDate, traineeName, trainingType);
     }
 
     @Transactional(readOnly = true)

@@ -1,11 +1,8 @@
 package com.epam.service;
 
 import com.epam.service.config.AppConfig;
+import com.epam.service.entity.*;
 import com.epam.service.facade.TrainingFacade;
-import com.epam.service.entity.Trainee;
-import com.epam.service.entity.Trainer;
-import com.epam.service.entity.Training;
-import com.epam.service.entity.TrainingType;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -21,31 +18,33 @@ public class Main {
 
         // Print loaded data
         System.out.println("Loaded Trainees:");
-        trainingFacade.selectAllTrainees().forEach(t -> System.out.println(t.getFirstName() + " " + t.getLastName()));
+        trainingFacade.selectAllTrainees().forEach(t -> System.out.println(t.getUser().getFirstName() + " " + t.getUser().getLastName()));
 
         System.out.println("Loaded Trainers:");
-        trainingFacade.selectAllTrainers().forEach(t -> System.out.println(t.getFirstName() + " " + t.getLastName()));
+        trainingFacade.selectAllTrainers().forEach(t -> System.out.println(t.getUser().getFirstName() + " " + t.getUser().getLastName()));
 
         // Create a trainee
         Trainee trainee = Trainee.builder()
+                .user(User.builder()
                 .firstName("John")
                 .lastName("Doe")
-                .isActive(true)
+                .isActive(true).build())
                 .dateOfBirth(new Date())
                 .address("123 Main St")
                 .build();
         trainee = trainingFacade.createTrainee(trainee);
-        System.out.println("Created Trainee: " + trainee.getUsername());
+        System.out.println("Created Trainee: " + trainee.getUser().getUsername());
 
         // Create a trainer
         Trainer trainer = Trainer.builder()
+                .user(User.builder()
                 .firstName("Jane")
                 .lastName("Doe")
-                .isActive(true)
+                .isActive(true).build())
                 .specialization(TrainingType.CARDIO)
                 .build();
         trainer = trainingFacade.createTrainer(trainer);
-        System.out.println("Created Trainer: " + trainer.getUsername());
+        System.out.println("Created Trainer: " + trainer.getUser().getUsername());
 
         // Create a training
         Training training = Training.builder()

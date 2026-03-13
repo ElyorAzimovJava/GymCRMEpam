@@ -12,13 +12,13 @@ import java.util.List;
 
 @Repository
 public interface TrainingRepository extends JpaRepository<Training, Long> {
-    List<Training> findByTraineeUsername(String username);
-    List<Training> findByTrainerUsername(String username);
+    List<Training> findByTraineeUserUsername(String username);
+    List<Training> findByTrainerUserUsername(String username);
     @Query("SELECT t FROM Training t WHERE " +
-            "t.trainer.username = :username AND " +
+            "t.trainer.user.username = :username AND " +
             "(:fromDate IS NULL OR t.trainingDate >= :fromDate) AND " +
             "(:toDate IS NULL OR t.trainingDate <= :toDate) AND " +
-            "(:trainerName IS NULL OR t.trainer.firstName = :trainerName) AND " +
+            "(:trainerName IS NULL OR t.trainer.user.firstName = :trainerName) AND " +
             "(:trainingType IS NULL OR t.trainingType = :trainingType)")
     List<Training> findTrainerTrainingsByCriteria(
             @Param("username") String username,
@@ -28,10 +28,10 @@ public interface TrainingRepository extends JpaRepository<Training, Long> {
             @Param("trainingType") TrainingType trainingType
     );
     @Query("SELECT t FROM Training t WHERE " +
-            "t.trainee.username = :username AND " +
+            "t.trainee.user.username = :username AND " +
             "(:fromDate IS NULL OR t.trainingDate >= :fromDate) AND " +
             "(:toDate IS NULL OR t.trainingDate <= :toDate) AND " +
-            "(:trainerName IS NULL OR t.trainee.firstName = :trainerName) AND " +
+            "(:trainerName IS NULL OR t.trainer.user.firstName = :trainerName) AND " +
             "(:trainingType IS NULL OR t.trainingType = :trainingType)")
     List<Training> findTraineeTrainingsByCriteria(
             @Param("username") String username,

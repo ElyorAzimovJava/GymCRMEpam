@@ -8,5 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface TrainerRepository extends JpaRepository<Trainer, Long> {
-    Optional<Trainer> findByUsername(String username);
+    Optional<Trainer> findByUserUsername(String username);
 }

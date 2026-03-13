@@ -4,6 +4,7 @@ import com.epam.service.repository.TraineeRepository;
 import com.epam.service.repository.TrainerRepository;
 import com.epam.service.entity.Trainee;
 import com.epam.service.entity.Trainer;
+import com.epam.service.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,13 +25,13 @@ public class TraineeService {
 
     @Transactional
     public Trainee createTrainee(Trainee trainee) {
-        log.info("Creating trainee for user: {} {}", trainee.getFirstName(), trainee.getLastName());
-        String username = usernameGenerator.generateUsername(trainee.getFirstName(), trainee.getLastName());
+        log.info("Creating trainee for user: {} {}", trainee.getUser().getFirstName(), trainee.getUser().getLastName());
+        String username = usernameGenerator.generateUsername(trainee.getUser().getFirstName(), trainee.getUser().getLastName());
         String password = PasswordGenerator.generatePassword();
-        trainee.setUsername(username);
-        trainee.setPassword(password);
+        trainee.getUser().setUsername(username);
+        trainee.getUser().setPassword(password);
         Trainee savedTrainee = traineeRepository.save(trainee);
-        log.info("Trainee created successfully with username: {}", savedTrainee.getUsername());
+        log.info("Trainee created successfully with username: {}", savedTrainee.getUser().getUsername());
         return savedTrainee;
     }
 
@@ -43,7 +44,7 @@ public class TraineeService {
     @Transactional(readOnly = true)
     public Trainee selectTraineeByUsername(String username) {
         log.info("Selecting trainee with username: {}", username);
-        return traineeRepository.findByUsername(username)
+        return traineeRepository.findByUserUsername(username)
                 .orElseThrow(() -> new RuntimeException("Trainee not found with username: " + username));
     }
 
@@ -66,16 +67,16 @@ public class TraineeService {
     }
 
     @Transactional
-    public void changeTraineePassword(String username, String newPassword) {
+    public void changeTraineePassword(String username, String oldPassword, String newPassword) {
         log.info("Changing password for trainee: {}", username);
-        userService.changePassword(username, newPassword);
+        userService.changePassword(username, oldPassword, newPassword);
     }
 
     @Transactional
     public void activateTrainee(String username) {
         log.info("Activating trainee: {}", username);
         Trainee trainee = selectTraineeByUsername(username);
-        trainee.setActive(true);
+        trainee.getUser().setActive(true);
         traineeRepository.save(trainee);
     }
 
@@ -83,7 +84,7 @@ public class TraineeService {
     public void deactivateTrainee(String username) {
         log.info("Deactivating trainee: {}", username);
         Trainee trainee = selectTraineeByUsername(username);
-        trainee.setActive(false);
+        trainee.getUser().setActive(false);
         traineeRepository.save(trainee);
     }
 
@@ -99,7 +100,7 @@ public class TraineeService {
         log.info("Updating trainers for trainee: {}", username);
         Trainee trainee = selectTraineeByUsername(username);
         List<Trainer> trainers = trainerUsernames.stream()
-                .map(trainerUsername -> trainerRepository.findByUsername(trainerUsername)
+                .map(trainerUsername -> trainerRepository.findByUserUsername(trainerUsername)
                         .orElseThrow(() -> new RuntimeException("Trainer not found with username: " + trainerUsername)))
                 .collect(Collectors.toList());
         trainee.setTrainers(trainers);

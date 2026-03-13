@@ -23,13 +23,13 @@ public class TrainerService {
 
     @Transactional
     public Trainer createTrainer(Trainer trainer) {
-        log.info("Creating trainer for user: {} {}", trainer.getFirstName(), trainer.getLastName());
-        String username = usernameGenerator.generateUsername(trainer.getFirstName(), trainer.getLastName());
+        log.info("Creating trainer for user: {} {}", trainer.getUser().getFirstName(), trainer.getUser().getLastName());
+        String username = usernameGenerator.generateUsername(trainer.getUser().getFirstName(), trainer.getUser().getLastName());
         String password = PasswordGenerator.generatePassword();
-        trainer.setUsername(username);
-        trainer.setPassword(password);
+        trainer.getUser().setUsername(username);
+        trainer.getUser().setPassword(password);
         Trainer savedTrainer = trainerRepository.save(trainer);
-        log.info("Trainer created successfully with username: {}", savedTrainer.getUsername());
+        log.info("Trainer created successfully with username: {}", savedTrainer.getUser().getUsername());
         return savedTrainer;
     }
     @Transactional(readOnly = true)
@@ -53,7 +53,7 @@ public class TrainerService {
     @Transactional(readOnly = true)
     public Trainer selectTrainerByUsername(String username) {
         log.info("Selecting trainer with username: {}", username);
-        return trainerRepository.findByUsername(username)
+        return trainerRepository.findByUserUsername(username)
                 .orElseThrow(() -> new RuntimeException("Trainer not found with username: " + username));
     }
 
@@ -64,16 +64,16 @@ public class TrainerService {
     }
 
     @Transactional
-    public void changeTrainerPassword(String username, String newPassword) {
+    public void changeTrainerPassword(String username, String oldPassword, String newPassword) {
         log.info("Changing password for trainer: {}", username);
-        userService.changePassword(username, newPassword);
+        userService.changePassword(username, oldPassword, newPassword);
     }
 
     @Transactional
     public void activateTrainer(String username) {
         log.info("Activating trainer: {}", username);
         Trainer trainer = selectTrainerByUsername(username);
-        trainer.setActive(true);
+        trainer.getUser().setActive(true);
         trainerRepository.save(trainer);
     }
 
@@ -81,7 +81,7 @@ public class TrainerService {
     public void deactivateTrainer(String username) {
         log.info("Deactivating trainer: {}", username);
         Trainer trainer = selectTrainerByUsername(username);
-        trainer.setActive(false);
+        trainer.getUser().setActive(false);
         trainerRepository.save(trainer);
     }
 
