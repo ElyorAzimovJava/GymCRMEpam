@@ -1,4 +1,4 @@
-package com.epam.service;
+package com.epam;
 
 import com.epam.service.config.AppConfig;
 import com.epam.service.entity.*;
@@ -7,8 +7,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Date;
 
 public class Main {
@@ -16,7 +14,7 @@ public class Main {
         ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
         TrainingFacade trainingFacade = context.getBean(TrainingFacade.class);
 
-        // Print loaded data
+
         System.out.println("Loaded Trainees:");
         trainingFacade.selectAllTrainees().forEach(t -> System.out.println(t.getUser().getFirstName() + " " + t.getUser().getLastName()));
 
@@ -30,7 +28,7 @@ public class Main {
                 .lastName("Doe")
                 .isActive(true).build())
                 .dateOfBirth(new Date())
-                .address("123 Main St")
+                .address("123 com.epam.Main St")
                 .build();
         trainee = trainingFacade.createTrainee(trainee);
         System.out.println("Created Trainee: " + trainee.getUser().getUsername());

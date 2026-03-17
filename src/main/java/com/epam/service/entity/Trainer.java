@@ -19,7 +19,7 @@ public class Trainer implements Serializable {
     private Long id;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
     @Enumerated(EnumType.STRING)

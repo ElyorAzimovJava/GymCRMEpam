@@ -54,7 +54,7 @@ class TraineeServiceTest {
         Trainee trainee = new Trainee();
         trainee.setUser(user);
         trainee.setDateOfBirth(new Date());
-        trainee.setAddress("123 Main St");
+        trainee.setAddress("123 com.epam.Main St");
 
         when(usernameGenerator.generateUsername(anyString(), anyString())).thenReturn("John.Doe");
         when(traineeRepository.save(any(Trainee.class))).thenReturn(trainee);
@@ -80,7 +80,7 @@ class TraineeServiceTest {
         trainee.setId(1L);
         trainee.setUser(user);
         trainee.setDateOfBirth(new Date());
-        trainee.setAddress("123 Main St");
+        trainee.setAddress("123 com.epam.Main St");
 
         when(traineeRepository.findById(1L)).thenReturn(Optional.of(trainee));
 
@@ -108,7 +108,7 @@ class TraineeServiceTest {
         trainee.setId(1L);
         trainee.setUser(user);
         trainee.setDateOfBirth(new Date());
-        trainee.setAddress("123 Main St");
+        trainee.setAddress("123 com.epam.Main St");
 
         when(traineeRepository.save(any(Trainee.class))).thenReturn(trainee);
 

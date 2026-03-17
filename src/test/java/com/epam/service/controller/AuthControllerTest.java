@@ -3,70 +3,87 @@ package com.epam.service.controller;
 import com.epam.service.dto.ChangePasswordRequestDto;
 import com.epam.service.dto.LoginRequestDto;
 import com.epam.service.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 class AuthControllerTest {
 
-    @InjectMocks
-    private AuthController authController;
+    private MockMvc mockMvc;
 
     @Mock
     private UserService userService;
 
+    @InjectMocks
+    private AuthController authController;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @BeforeEach
+    void setUp() {
+        mockMvc = MockMvcBuilders.standaloneSetup(authController).build();
+    }
+
     @Test
-    void testLoginSuccess() {
+    void testLoginSuccess() throws Exception {
         LoginRequestDto request = new LoginRequestDto();
-        request.setUsername("John.Doe");
+        request.setUsername("user");
         request.setPassword("password");
 
-        when(userService.checkCredentials("John.Doe", "password")).thenReturn(true);
+        when(userService.checkCredentials("user", "password")).thenReturn(true);
 
-        ResponseEntity<Void> response = authController.login(request);
+        mockMvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
 
-        assertEquals(200, response.getStatusCodeValue());
-        verify(userService, times(1))
-                .checkCredentials("John.Doe", "password");
+        verify(userService).checkCredentials("user", "password");
     }
 
     @Test
-    void testLoginUnauthorized() {
+    void testLoginFailure() throws Exception {
         LoginRequestDto request = new LoginRequestDto();
-        request.setUsername("John.Doe");
-        request.setPassword("wrongPassword");
+        request.setUsername("user");
+        request.setPassword("wrong_password");
 
-        when(userService.checkCredentials("John.Doe", "wrongPassword")).thenReturn(false);
+        when(userService.checkCredentials("user", "wrong_password")).thenReturn(false);
 
-        ResponseEntity<Void> response = authController.login(request);
+        mockMvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isUnauthorized());
 
-        assertEquals(401, response.getStatusCodeValue());
-        verify(userService, times(1))
-                .checkCredentials("John.Doe", "wrongPassword");
+        verify(userService).checkCredentials("user", "wrong_password");
     }
 
     @Test
-    void testChangePassword() {
+    void testChangePassword() throws Exception {
         ChangePasswordRequestDto request = new ChangePasswordRequestDto();
-        request.setUsername("John.Doe");
-        request.setOldPassword("oldPassword");
-        request.setNewPassword("newPassword");
+        request.setUsername("user");
+        request.setOldPassword("old_password");
+        request.setNewPassword("new_password");
 
         doNothing().when(userService)
-                .changePassword("John.Doe", "oldPassword", "newPassword");
+                .changePassword("user", "old_password", "new_password");
 
-        ResponseEntity<Void> response = authController.changePassword(request);
+        mockMvc.perform(put("/auth/password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
 
-        assertEquals(200, response.getStatusCodeValue());
-
-        verify(userService, times(1))
-                .changePassword("John.Doe", "oldPassword", "newPassword");
+        verify(userService).changePassword("user", "old_password", "new_password");
     }
 }

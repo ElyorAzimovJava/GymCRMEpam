@@ -20,7 +20,7 @@ public class Trainee implements Serializable {
     private Long id;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
     @Column(nullable = false)

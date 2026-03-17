@@ -55,11 +55,16 @@ public class TrainingController {
     }     
     @GetMapping("/trainee/{username}")
     public ResponseEntity<List<TraineeTrainingResponseDto>> getTraineeTrainings(
-            @PathVariable String username,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date toDate,
-            @RequestParam(required = false) String trainerName,
-            @RequestParam(required = false) TrainingType trainingType) {
+            @PathVariable("username") String username,
+            @RequestParam(value = "fromDate", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date fromDate,
+
+            @RequestParam(value = "toDate", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date toDate,
+
+            @RequestParam(value = "trainerName", required = false) String trainerName,
+
+            @RequestParam(value = "trainingType", required = false) TrainingType trainingType) {
 
         List<Training> trainings = trainingService.getTraineeTrainings(username, fromDate, toDate, trainerName, trainingType);
 
@@ -81,11 +86,17 @@ public class TrainingController {
 
     @GetMapping("/trainer/{username}")
     public ResponseEntity<List<TrainerTrainingResponseDto>> getTrainerTrainings(
-            @PathVariable String username,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date toDate,
-            @RequestParam(required = false) String traineeName,
-            @RequestParam(required = false) TrainingType trainingType) {
+            @PathVariable("username") String username,
+
+            @RequestParam(value = "fromDate", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date fromDate,
+
+            @RequestParam(value = "toDate", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date toDate,
+
+            @RequestParam(value = "traineeName", required = false) String traineeName,
+
+            @RequestParam(value = "trainingType", required = false) TrainingType trainingType) {
 
         List<Training> trainings = trainingService.getTrainerTrainings(username, fromDate, toDate, traineeName, trainingType);
 

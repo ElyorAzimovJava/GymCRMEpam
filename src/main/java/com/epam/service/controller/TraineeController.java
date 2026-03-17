@@ -48,7 +48,7 @@ public class TraineeController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
     @PatchMapping("/{username}/status")
-    public ResponseEntity<Void> updateTraineeStatus(@PathVariable String username, @RequestBody ActivationRequestDto request) {
+    public ResponseEntity<Void> updateTraineeStatus(@PathVariable("username") String username, @RequestBody ActivationRequestDto request) {
         if (request.isActive()) {
             traineeService.activateTrainee(username);
         } else {
@@ -59,7 +59,7 @@ public class TraineeController {
 
 
     @PutMapping("/{username}/trainers")
-    public ResponseEntity<List<TrainerDto>> updateTraineeTrainers(@PathVariable String username, @RequestBody List<String> trainerUsernames) {
+    public ResponseEntity<List<TrainerDto>> updateTraineeTrainers(@PathVariable("username") String username, @RequestBody List<String> trainerUsernames) {
         Trainee trainee = traineeService.selectTraineeByUsername(username);
         List<Trainer> trainers = trainerUsernames.stream()
                 .map(trainerService::selectTrainerByUsername)
@@ -82,7 +82,7 @@ public class TraineeController {
 
 
     @GetMapping("/{username}")
-    public ResponseEntity<TraineeProfileResponseDto> getTraineeProfile(@PathVariable String username) {
+    public ResponseEntity<TraineeProfileResponseDto> getTraineeProfile(@PathVariable("username") String username) {
         Trainee trainee = traineeService.selectTraineeByUsername(username);
 
         TraineeProfileResponseDto response = new TraineeProfileResponseDto();
@@ -104,7 +104,7 @@ public class TraineeController {
     }
 
     @PutMapping("/{username}")
-    public ResponseEntity<TraineeProfileResponseDto> updateTraineeProfile(@PathVariable String username, @RequestBody TraineeProfileUpdateRequestDto request) {
+    public ResponseEntity<TraineeProfileResponseDto> updateTraineeProfile(@PathVariable("username") String username, @RequestBody TraineeProfileUpdateRequestDto request) {
         Trainee traineeToUpdate = traineeService.selectTraineeByUsername(username);
         traineeToUpdate.getUser().setFirstName(request.getFirstName());
         traineeToUpdate.getUser().setLastName(request.getLastName());
@@ -133,13 +133,13 @@ public class TraineeController {
     }
 
     @DeleteMapping("/{username}")
-    public ResponseEntity<Void> deleteTraineeProfile(@PathVariable String username) {
+    public ResponseEntity<Void> deleteTraineeProfile(@PathVariable("username") String username) {
         traineeService.deleteTraineeByUsername(username);
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/{username}/not-assigned-trainers")
-    public ResponseEntity<List<TrainerDto>> getNotAssignedTrainers(@PathVariable String username) {
+    @GetMapping("/{username}/trainers/not-assigned")
+    public ResponseEntity<List<TrainerDto>> getNotAssignedTrainers(@PathVariable("username") String username) {
         List<Trainer> notAssignedTrainers = trainerService.getUnassignedTrainers(username);
         List<TrainerDto> response = notAssignedTrainers.stream().map(trainer -> {
             TrainerDto trainerDto = new TrainerDto();

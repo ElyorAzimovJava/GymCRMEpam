@@ -1,26 +1,36 @@
 package com.epam.service.controller;
 
-import com.epam.service.dto.TraineeTrainingResponseDto;
-import com.epam.service.dto.TrainerTrainingResponseDto;
 import com.epam.service.dto.TrainingRequestDto;
 import com.epam.service.entity.*;
 import com.epam.service.service.TraineeService;
 import com.epam.service.service.TrainerService;
 import com.epam.service.service.TrainingService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 class TrainingControllerTest {
@@ -37,9 +47,18 @@ class TrainingControllerTest {
     @Mock
     private TrainerService trainerService;
 
-    @Test
-    void testCreateTraining() {
+    private MockMvc mockMvc;
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @BeforeEach
+    void setUp() {
+        mockMvc = MockMvcBuilders.standaloneSetup(trainingController).build();
+        objectMapper.findAndRegisterModules();
+    }
+
+    @Test
+    void testCreateTraining() throws Exception {
         TrainingRequestDto request = new TrainingRequestDto();
         request.setTraineeUsername("John.Doe");
         request.setTrainerUsername("Mike.Tyson");
@@ -47,35 +66,19 @@ class TrainingControllerTest {
         request.setTrainingDate(new Date());
         request.setTrainingDuration(Duration.ofMinutes(60));
 
-        User traineeUser = new User();
-        traineeUser.setUsername("John.Doe");
+        when(traineeService.selectTraineeByUsername(anyString())).thenReturn(new Trainee());
+        when(trainerService.selectTrainerByUsername(anyString())).thenReturn(new Trainer());
 
-        Trainee trainee = new Trainee();
-        trainee.setUser(traineeUser);
+        mockMvc.perform(post("/trainings")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated());
 
-        User trainerUser = new User();
-        trainerUser.setUsername("Mike.Tyson");
-
-        Trainer trainer = new Trainer();
-        trainer.setUser(trainerUser);
-        trainer.setSpecialization(TrainingType.CARDIO);
-
-        when(traineeService.selectTraineeByUsername("John.Doe")).thenReturn(trainee);
-        when(trainerService.selectTrainerByUsername("Mike.Tyson")).thenReturn(trainer);
-
-        when(trainingService.createTraining(any(Training.class)))
-                .thenReturn(new Training());
-
-        ResponseEntity<Void> response = trainingController.createTraining(request);
-
-        assertEquals(201, response.getStatusCodeValue());
-
-        verify(trainingService, times(1)).createTraining(any(Training.class));
+        verify(trainingService).createTraining(any(Training.class));
     }
 
     @Test
-    void testGetTraineeTrainings() {
-
+    void testGetTraineeTrainings() throws Exception {
         User trainerUser = new User();
         trainerUser.setFirstName("Mike");
 
@@ -92,28 +95,16 @@ class TrainingControllerTest {
         when(trainingService.getTraineeTrainings(anyString(), any(), any(), any(), any()))
                 .thenReturn(Collections.singletonList(training));
 
-        ResponseEntity<List<TraineeTrainingResponseDto>> response =
-                trainingController.getTraineeTrainings("John.Doe", null, null, null, null);
-
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals(1, response.getBody().size());
+        mockMvc.perform(get("/trainings/trainee/John.Doe"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].trainingName", is("Morning Training")));
 
         verify(trainingService).getTraineeTrainings(anyString(), any(), any(), any(), any());
     }
 
     @Test
-    void testGetTrainingTypes() {
-
-        ResponseEntity<List<TrainingType>> response = trainingController.getTrainingTypes();
-
-        assertEquals(200, response.getStatusCodeValue());
-        assertNotNull(response.getBody());
-        assertTrue(response.getBody().size() > 0);
-    }
-
-    @Test
-    void testGetTrainerTrainings() {
-
+    void testGetTrainerTrainings() throws Exception {
         User traineeUser = new User();
         traineeUser.setFirstName("John");
 
@@ -130,12 +121,19 @@ class TrainingControllerTest {
         when(trainingService.getTrainerTrainings(anyString(), any(), any(), any(), any()))
                 .thenReturn(Collections.singletonList(training));
 
-        ResponseEntity<List<TrainerTrainingResponseDto>> response =
-                trainingController.getTrainerTrainings("Mike.Tyson", null, null, null, null);
-
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals(1, response.getBody().size());
+        mockMvc.perform(get("/trainings/trainer/Mike.Tyson"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].trainingName", is("Morning Training")))
+                .andExpect(jsonPath("$[0].traineeName", is("John")));
 
         verify(trainingService).getTrainerTrainings(anyString(), any(), any(), any(), any());
+    }
+
+    @Test
+    void testGetTrainingTypes() throws Exception {
+        mockMvc.perform(get("/trainings/types"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(5)));
     }
 }

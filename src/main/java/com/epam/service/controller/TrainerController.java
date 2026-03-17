@@ -9,6 +9,8 @@ import com.epam.service.dto.TrainerRegistrationRequestDto;
 import com.epam.service.entity.Trainer;
 import com.epam.service.entity.User;
 import com.epam.service.service.TrainerService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,13 +18,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.stream.Collectors;
 
+@Tag(name = "Trainer API", description = "Operations with trainers")
 @RestController
 @RequestMapping("/trainers")
 @RequiredArgsConstructor
 public class TrainerController {
 
     private final TrainerService trainerService;
-
+    @Operation(summary = "Register trainer")
     @PostMapping("/register")
     public ResponseEntity<RegistrationResponseDto> registerTrainer(@RequestBody TrainerRegistrationRequestDto request) {
         User user = new User();
@@ -43,7 +46,7 @@ public class TrainerController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
     @PatchMapping("/{username}/status")
-    public ResponseEntity<Void> updateTrainerStatus(@PathVariable String username, @RequestBody ActivationRequestDto request) {
+    public ResponseEntity<Void> updateTrainerStatus(@PathVariable("username") String username, @RequestBody ActivationRequestDto request) {
         if (request.isActive()) {
             trainerService.activateTrainer(username);
         } else {
@@ -53,7 +56,7 @@ public class TrainerController {
     }
 
     @GetMapping("/{username}")
-    public ResponseEntity<TrainerProfileResponseDto> getTrainerProfile(@PathVariable String username) {
+    public ResponseEntity<TrainerProfileResponseDto> getTrainerProfile(@PathVariable("username") String username) {
         Trainer trainer = trainerService.selectTrainerByUsername(username);
 
         TrainerProfileResponseDto response = new TrainerProfileResponseDto();
@@ -73,7 +76,7 @@ public class TrainerController {
     }
 
     @PutMapping("/{username}")
-    public ResponseEntity<TrainerProfileResponseDto> updateTrainerProfile(@PathVariable String username, @RequestBody TrainerProfileUpdateRequestDto request) {
+    public ResponseEntity<TrainerProfileResponseDto> updateTrainerProfile(@PathVariable("username") String username, @RequestBody TrainerProfileUpdateRequestDto request) {
         Trainer trainerToUpdate = trainerService.selectTrainerByUsername(username);
         trainerToUpdate.getUser().setFirstName(request.getFirstName());
         trainerToUpdate.getUser().setLastName(request.getLastName());
