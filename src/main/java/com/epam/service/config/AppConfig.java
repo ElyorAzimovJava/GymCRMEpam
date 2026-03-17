@@ -1,20 +1,25 @@
 package com.epam.service.config;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import javax.sql.DataSource;
 import java.util.Properties;
 
 @Configuration
-@ComponentScan("com.epam.service")
+@ComponentScan(
+        basePackages = "com.epam.service",
+        excludeFilters = {
+                @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = WebConfig.class),
+                @ComponentScan.Filter(type = FilterType.ANNOTATION, value = Controller.class)
+        }
+)
 @PropertySource("classpath:application.properties")
 @EnableTransactionManagement
 @EnableJpaRepositories("com.epam.service.repository")
