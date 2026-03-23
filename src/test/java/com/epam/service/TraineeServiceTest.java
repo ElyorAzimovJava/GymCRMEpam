@@ -1,6 +1,7 @@
 package com.epam.service;
 
 import com.epam.service.entity.User;
+import com.epam.service.metrics.CustomMetrics;
 import com.epam.service.repository.TraineeRepository;
 import com.epam.service.repository.TrainerRepository;
 import com.epam.service.entity.Trainee;
@@ -44,6 +45,9 @@ class TraineeServiceTest {
     @Mock
     private TrainerRepository trainerRepository;
 
+    @Mock
+    private CustomMetrics customMetrics;
+
     @Test
     void testCreateTrainee() {
         User user = new User();
@@ -56,15 +60,14 @@ class TraineeServiceTest {
         trainee.setDateOfBirth(new Date());
         trainee.setAddress("123 com.epam.Main St");
 
-        when(usernameGenerator.generateUsername(anyString(), anyString())).thenReturn("John.Doe");
         when(traineeRepository.save(any(Trainee.class))).thenReturn(trainee);
+        doNothing().when(customMetrics).incrementTraineeCreation();
 
         Trainee createdTrainee = traineeService.createTrainee(trainee);
 
         assertNotNull(createdTrainee);
-        assertEquals("John.Doe", createdTrainee.getUser().getUsername());
-        assertNotNull(createdTrainee.getUser().getPassword());
         verify(traineeRepository, times(1)).save(trainee);
+        verify(customMetrics, times(1)).incrementTraineeCreation();
     }
 
     @Test

@@ -2,6 +2,7 @@ package com.epam.service.service;
 
 import com.epam.service.repository.TrainerRepository;
 import com.epam.service.entity.Trainee;
+import com.epam.service.metrics.CustomMetrics;
 import com.epam.service.entity.Trainer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,7 @@ public class TrainerService {
     private final UserService userService;
     private final UsernameGenerator usernameGenerator;
     private final TraineeService traineeService;
+    private final CustomMetrics customMetrics;
 
     @Transactional
     public Trainer createTrainer(Trainer trainer) {
@@ -29,6 +31,7 @@ public class TrainerService {
         trainer.getUser().setUsername(username);
         trainer.getUser().setPassword(password);
         Trainer savedTrainer = trainerRepository.save(trainer);
+        customMetrics.incrementTrainerCreation();
         log.info("Trainer created successfully with username: {}", savedTrainer.getUser().getUsername());
         return savedTrainer;
     }

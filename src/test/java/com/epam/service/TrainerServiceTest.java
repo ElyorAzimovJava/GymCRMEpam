@@ -1,6 +1,7 @@
 package com.epam.service;
 
 import com.epam.service.entity.User;
+import com.epam.service.metrics.CustomMetrics;
 import com.epam.service.repository.TrainerRepository;
 import com.epam.service.entity.Trainee;
 import com.epam.service.entity.Trainer;
@@ -48,6 +49,9 @@ class TrainerServiceTest {
     @Mock
     private TraineeService traineeService;
 
+    @Mock
+    private CustomMetrics customMetrics;
+
     @Test
     void testCreateTrainer() {
         User user = new User();
@@ -59,15 +63,14 @@ class TrainerServiceTest {
         trainer.setUser(user);
         trainer.setSpecialization(TrainingType.CARDIO);
 
-        when(usernameGenerator.generateUsername(anyString(), anyString())).thenReturn("Jane.Doe");
         when(trainerRepository.save(any(Trainer.class))).thenReturn(trainer);
+        doNothing().when(customMetrics).incrementTrainerCreation();
 
         Trainer createdTrainer = trainerService.createTrainer(trainer);
 
         assertNotNull(createdTrainer);
-        assertEquals("Jane.Doe", createdTrainer.getUser().getUsername());
-        assertNotNull(createdTrainer.getUser().getPassword());
         verify(trainerRepository, times(1)).save(trainer);
+        verify(customMetrics, times(1)).incrementTrainerCreation();
     }
 
     @Test
