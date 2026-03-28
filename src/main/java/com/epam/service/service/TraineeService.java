@@ -8,6 +8,7 @@ import com.epam.service.entity.User;
 import com.epam.service.metrics.CustomMetrics;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,7 @@ public class TraineeService {
     private final UserService userService;
     private final UsernameGenerator usernameGenerator;
     private final CustomMetrics customMetrics;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public Trainee createTrainee(Trainee trainee) {
@@ -31,7 +33,7 @@ public class TraineeService {
         String username = usernameGenerator.generateUsername(trainee.getUser().getFirstName(), trainee.getUser().getLastName());
         String password = PasswordGenerator.generatePassword();
         trainee.getUser().setUsername(username);
-        trainee.getUser().setPassword(password);
+        trainee.getUser().setPassword(passwordEncoder.encode(password));
         Trainee savedTrainee = traineeRepository.save(trainee);
         customMetrics.incrementTraineeCreation();
         log.info("Trainee created successfully with username: {}", savedTrainee.getUser().getUsername());

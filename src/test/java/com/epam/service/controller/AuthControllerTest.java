@@ -2,7 +2,9 @@ package com.epam.service.controller;
 
 import com.epam.service.dto.ChangePasswordRequestDto;
 import com.epam.service.dto.LoginRequestDto;
+import com.epam.service.service.BruteForceProtector;
 import com.epam.service.service.UserService;
+import com.epam.service.util.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,12 +13,21 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.ArrayList;
+
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
@@ -25,7 +36,16 @@ class AuthControllerTest {
     private MockMvc mockMvc;
 
     @Mock
+    private AuthenticationManager authenticationManager;
+
+    @Mock
     private UserService userService;
+
+    @Mock
+    private JwtUtil jwtUtil;
+
+    @Mock
+    private BruteForceProtector bruteForceProtector;
 
     @InjectMocks
     private AuthController authController;
@@ -43,14 +63,20 @@ class AuthControllerTest {
         request.setUsername("user");
         request.setPassword("password");
 
-        when(userService.checkCredentials("user", "password")).thenReturn(true);
+        UserDetails userDetails = new User("user", "password", new ArrayList<>());
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+        when(bruteForceProtector.isBlocked("user")).thenReturn(false);
+        when(authenticationManager.authenticate(any())).thenReturn(authentication);
+        when(jwtUtil.generateToken(userDetails)).thenReturn("jwt_token");
 
         mockMvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().string("jwt_token"));
 
-        verify(userService).checkCredentials("user", "password");
+        verify(bruteForceProtector).loginSucceeded("user");
     }
 
     @Test
@@ -59,14 +85,37 @@ class AuthControllerTest {
         request.setUsername("user");
         request.setPassword("wrong_password");
 
-        when(userService.checkCredentials("user", "wrong_password")).thenReturn(false);
+        when(bruteForceProtector.isBlocked("user")).thenReturn(false);
+        when(authenticationManager.authenticate(any())).thenThrow(new BadCredentialsException("Invalid credentials"));
 
         mockMvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized());
 
-        verify(userService).checkCredentials("user", "wrong_password");
+        verify(bruteForceProtector).loginFailed("user");
+    }
+
+    @Test
+    void testLoginBlocked() throws Exception {
+        LoginRequestDto request = new LoginRequestDto();
+        request.setUsername("user");
+        request.setPassword("password");
+
+        when(bruteForceProtector.isBlocked("user")).thenReturn(true);
+
+        mockMvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isUnauthorized());
+
+        verify(authenticationManager, never()).authenticate(any());
+    }
+
+    @Test
+    void testLogout() throws Exception {
+        mockMvc.perform(post("/auth/logout"))
+                .andExpect(status().isOk());
     }
 
     @Test

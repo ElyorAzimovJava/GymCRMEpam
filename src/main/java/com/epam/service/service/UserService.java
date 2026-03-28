@@ -3,20 +3,46 @@ package com.epam.service.service;
 import com.epam.service.entity.User;
 import com.epam.service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
+    private final BruteForceProtector bruteForceProtector;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Override
     @Transactional(readOnly = true)
-    public boolean checkCredentials(String username, String password) {
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        if (bruteForceProtector.isBlocked(username)) {
+            throw new RuntimeException("User is blocked");
+        }
+
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
-        return user.getPassword().equals(password);
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+
+        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), new ArrayList<>());
+    }
+
+    public Boolean checkLogin(String username, String password) {
+        try {
+            UserDetails userDetails = loadUserByUsername(username);
+            return passwordEncoder.matches(password, userDetails.getPassword());
+        } catch (UsernameNotFoundException e) {
+            return false;
+        }
     }
 
     @Transactional
@@ -24,12 +50,11 @@ public class UserService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
 
-        // In a real application, you would use a password encoder
-        if (!user.getPassword().equals(oldPassword)) {
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
             throw new IllegalArgumentException("Invalid old password");
         }
 
-        user.setPassword(newPassword);
+        user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
     }
 }

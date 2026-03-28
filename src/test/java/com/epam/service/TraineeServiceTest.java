@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.*;
 
@@ -48,6 +49,9 @@ class TraineeServiceTest {
     @Mock
     private CustomMetrics customMetrics;
 
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
     @Test
     void testCreateTrainee() {
         User user = new User();
@@ -61,6 +65,7 @@ class TraineeServiceTest {
         trainee.setAddress("123 com.epam.Main St");
 
         when(traineeRepository.save(any(Trainee.class))).thenReturn(trainee);
+        when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
         doNothing().when(customMetrics).incrementTraineeCreation();
 
         Trainee createdTrainee = traineeService.createTrainee(trainee);

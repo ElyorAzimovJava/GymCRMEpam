@@ -1,8 +1,10 @@
 package com.epam.service.interceptor;
 
 import com.epam.service.service.UserService;
+import jakarta.annotation.Nonnull;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -18,7 +20,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
     private final UserService userService;
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle( HttpServletRequest request, @Nonnull HttpServletResponse response, @Nonnull Object handler) throws Exception {
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader != null && authHeader.startsWith("Basic ")) {
@@ -31,8 +33,8 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
                     String username = values[0];
                     String password = values[1];
 
-                    if (userService.checkCredentials(username, password)) {
-                        return true; // Authentication successful
+                    if (userService.checkLogin(username, password)) {
+                        return true;
                     }
                 }
             } catch (Exception e) {
