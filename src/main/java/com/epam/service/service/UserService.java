@@ -4,6 +4,7 @@ import com.epam.service.entity.User;
 import com.epam.service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -21,6 +22,7 @@ public class UserService implements UserDetailsService {
     private final BruteForceProtector bruteForceProtector;
 
     @Autowired
+    @Lazy
     private PasswordEncoder passwordEncoder;
 
     @Override
