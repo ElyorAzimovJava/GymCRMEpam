@@ -35,6 +35,11 @@ public class SecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
+
+    // TODO:
+    //  The permitAll() paths are /users/register/trainee and /users/register/trainer,
+    //  but the actual controller endpoints are /trainees/register and /trainers/register
+    //  This kind of errors should be caught early by tests, please add them and you'll also get you coverage increased
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
@@ -47,6 +52,11 @@ public class SecurityConfig {
         return http.build();
     }
 
+    // TODO:
+    //  Danger!!!
+    //  Wildcard origin (*) cannot be used with credentials=true. This is enforced by 'Fetch Standard' specification
+    //  and implemented in modern browsers. Without that rule any website could send authenticated requests to your BE
+    //  and read responses
     @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

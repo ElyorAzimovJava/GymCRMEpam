@@ -45,6 +45,10 @@ public class JwtUtil {
         return claimsResolver.apply(claims);
     }
 
+    // TODO:
+    //  You are using jjwt 0.13.0, but the implementation still relies on deprecated methods from older versions
+    //  (e.g., Jwts.parser(), parseClaimsJws(), setSigningKey(...), signWith(key, SignatureAlgorithm)).
+    //  IDE should warn about this
     private Claims getAllClaimsFromToken(String token) {
         return Jwts.parser().setSigningKey(key).build().parseClaimsJws(token).getBody();
     }

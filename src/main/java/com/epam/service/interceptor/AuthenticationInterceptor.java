@@ -4,7 +4,6 @@ import com.epam.service.service.UserService;
 import jakarta.annotation.Nonnull;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -12,6 +11,9 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.util.Base64;
 
+
+// TODO:
+//  Do you still need Basic Auth if JWT filter is implemented?
 @Slf4j
 @Component
 @RequiredArgsConstructor

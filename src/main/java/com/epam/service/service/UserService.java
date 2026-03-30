@@ -23,6 +23,11 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     @Lazy
+    // TODO:
+    //  [Optional]
+    //  Well, @Lazy works, but we should rely on it as a last resort. The fact that we have a circular dependency
+    //  indicates that the class design might need some adjustments. The first thing I would do to break the cycle -
+    //  extract dependent logic into a separate component. Service layout A -> B -> A turns into A -> C, B -> C
     private PasswordEncoder passwordEncoder;
 
     @Override

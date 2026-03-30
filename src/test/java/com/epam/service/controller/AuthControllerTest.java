@@ -112,6 +112,14 @@ class AuthControllerTest {
         verify(authenticationManager, never()).authenticate(any());
     }
 
+
+    // TODO:
+    //  Have you tried to test the following scenario:
+    //  1. User logs in successfully and receives a JWT
+    //  2. User calls logout
+    //  3. User tries to access a protected resource with the same JWT
+    //  To test that I would recommend to change this class a bit, it should not use mockMvc.standalone,
+    //  but rather @SpringBootTest so that the whole security configuration and a jwt filter are loaded
     @Test
     void testLogout() throws Exception {
         mockMvc.perform(post("/auth/logout"))
