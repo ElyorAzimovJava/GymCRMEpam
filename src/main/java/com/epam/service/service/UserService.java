@@ -20,15 +20,7 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final BruteForceProtector bruteForceProtector;
-
-    @Autowired
-    @Lazy
-    // TODO:
-    //  [Optional]
-    //  Well, @Lazy works, but we should rely on it as a last resort. The fact that we have a circular dependency
-    //  indicates that the class design might need some adjustments. The first thing I would do to break the cycle -
-    //  extract dependent logic into a separate component. Service layout A -> B -> A turns into A -> C, B -> C
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoderService passwordEncoderService;
 
     @Override
     @Transactional(readOnly = true)
@@ -46,7 +38,7 @@ public class UserService implements UserDetailsService {
     public Boolean checkLogin(String username, String password) {
         try {
             UserDetails userDetails = loadUserByUsername(username);
-            return passwordEncoder.matches(password, userDetails.getPassword());
+            return passwordEncoderService.matches(password, userDetails.getPassword());
         } catch (UsernameNotFoundException e) {
             return false;
         }
@@ -57,11 +49,11 @@ public class UserService implements UserDetailsService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
 
-        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+        if (!passwordEncoderService.matches(oldPassword, user.getPassword())) {
             throw new IllegalArgumentException("Invalid old password");
         }
 
-        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setPassword(passwordEncoderService.encode(newPassword));
         userRepository.save(user);
     }
 }
