@@ -40,6 +40,8 @@ public class TraineeController {
 
         Trainee createdTrainee = traineeService.createTrainee(trainee);
 
+        // TODO:
+        //  What is the use case for returning the password in the response?
         RegistrationResponseDto response = new RegistrationResponseDto(
                 createdTrainee.getUser().getUsername(),
                 createdTrainee.getUser().getPassword()

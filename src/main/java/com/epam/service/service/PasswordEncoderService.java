@@ -3,6 +3,9 @@ package com.epam.service.service;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+
+// TODO:
+//  Does it add value to have this service instead of using PasswordEncoder directly? If not, consider removing this wrapper
 @Service
 public class PasswordEncoderService {
 

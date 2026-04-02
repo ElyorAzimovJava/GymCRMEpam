@@ -5,6 +5,9 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.time.Duration;
+// TODO:
+//  Unused imports! Please review and clean the project from all redundant code.
+//  IDE code inspection shows 23 unused imports and 29 unused declarations warnings
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;

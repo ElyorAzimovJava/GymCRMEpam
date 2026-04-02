@@ -35,6 +35,8 @@ public class UserService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), new ArrayList<>());
     }
 
+    // TODO:
+    //  Unused code, please remove for cleanliness and maintainability of the project
     public Boolean checkLogin(String username, String password) {
         try {
             UserDetails userDetails = loadUserByUsername(username);
