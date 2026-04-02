@@ -3,8 +3,10 @@
     import com.epam.service.dto.ChangePasswordRequestDto;
 import com.epam.service.dto.LoginRequestDto;
 import com.epam.service.service.BruteForceProtector;
+import com.epam.service.service.JwtBlacklistService;
 import com.epam.service.service.UserService;
 import com.epam.service.util.JwtUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,6 +26,7 @@ public class AuthController {
     private final UserService userService;
     private final JwtUtil jwtUtil;
     private final BruteForceProtector bruteForceProtector;
+    private final JwtBlacklistService jwtBlacklistService;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDto request) {
@@ -48,7 +51,12 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout() {
+    public ResponseEntity<Void> logout(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String jwt = authHeader.substring(7);
+            jwtBlacklistService.blacklist(jwt);
+        }
         SecurityContextHolder.clearContext();
         return ResponseEntity.ok().build();
     }

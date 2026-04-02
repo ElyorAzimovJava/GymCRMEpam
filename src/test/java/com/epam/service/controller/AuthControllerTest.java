@@ -12,6 +12,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -30,32 +33,35 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ExtendWith(MockitoExtension.class)
+import com.epam.service.service.JwtBlacklistService;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.web.servlet.MvcResult;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+
+@SpringBootTest
+@AutoConfigureMockMvc
 class AuthControllerTest {
 
+    @Autowired
     private MockMvc mockMvc;
 
-    @Mock
+    @MockBean
     private AuthenticationManager authenticationManager;
 
-    @Mock
+    @MockBean
     private UserService userService;
 
-    @Mock
+    @MockBean
     private JwtUtil jwtUtil;
 
-    @Mock
+    @MockBean
     private BruteForceProtector bruteForceProtector;
 
-    @InjectMocks
-    private AuthController authController;
+    @MockBean
+    private JwtBlacklistService jwtBlacklistService;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
-
-    @BeforeEach
-    void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(authController).build();
-    }
 
     @Test
     void testLoginSuccess() throws Exception {
@@ -114,8 +120,36 @@ class AuthControllerTest {
 
     @Test
     void testLogout() throws Exception {
-        mockMvc.perform(post("/auth/logout"))
+        LoginRequestDto loginRequest = new LoginRequestDto();
+        loginRequest.setUsername("user");
+        loginRequest.setPassword("password");
+
+        UserDetails userDetails = new User("user", "password", new ArrayList<>());
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+        when(bruteForceProtector.isBlocked("user")).thenReturn(false);
+        when(authenticationManager.authenticate(any())).thenReturn(authentication);
+        when(jwtUtil.generateToken(userDetails)).thenReturn("jwt_token");
+        when(jwtUtil.getUsernameFromToken("jwt_token")).thenReturn("user");
+        when(userService.loadUserByUsername("user")).thenReturn(userDetails);
+        when(jwtUtil.validateToken("jwt_token", userDetails)).thenReturn(true);
+
+        MvcResult result = mockMvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String jwt = result.getResponse().getContentAsString();
+
+        mockMvc.perform(post("/auth/logout").header("Authorization", "Bearer " + jwt))
                 .andExpect(status().isOk());
+
+        when(jwtBlacklistService.isBlacklisted(jwt)).thenReturn(true);
+
+        mockMvc.perform(get("/trainees/user")
+                        .header("Authorization", "Bearer " + jwt))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -128,7 +162,25 @@ class AuthControllerTest {
         doNothing().when(userService)
                 .changePassword("user", "old_password", "new_password");
 
-        mockMvc.perform(put("/auth/password")
+        UserDetails userDetails = new User("user", "password", new ArrayList<>());
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+        when(bruteForceProtector.isBlocked("user")).thenReturn(false);
+        when(authenticationManager.authenticate(any())).thenReturn(authentication);
+        when(jwtUtil.generateToken(userDetails)).thenReturn("jwt_token");
+        when(jwtUtil.getUsernameFromToken("jwt_token")).thenReturn("user");
+        when(userService.loadUserByUsername("user")).thenReturn(userDetails);
+        when(jwtUtil.validateToken("jwt_token", userDetails)).thenReturn(true);
+
+        MvcResult result = mockMvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new LoginRequestDto("user", "password"))))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String jwt = result.getResponse().getContentAsString();
+
+        mockMvc.perform(put("/auth/password").header("Authorization", "Bearer " + jwt)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
