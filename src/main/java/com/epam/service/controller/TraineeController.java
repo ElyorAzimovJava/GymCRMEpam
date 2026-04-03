@@ -41,8 +41,7 @@ public class TraineeController {
         Trainee createdTrainee = traineeService.createTrainee(trainee);
 
         RegistrationResponseDto response = new RegistrationResponseDto(
-                createdTrainee.getUser().getUsername(),
-                createdTrainee.getUser().getPassword()
+                createdTrainee.getUser().getUsername()
         );
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);

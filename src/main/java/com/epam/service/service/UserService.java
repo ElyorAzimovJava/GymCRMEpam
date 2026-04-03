@@ -3,8 +3,6 @@ package com.epam.service.service;
 import com.epam.service.entity.User;
 import com.epam.service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -20,7 +18,7 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final BruteForceProtector bruteForceProtector;
-    private final PasswordEncoderService passwordEncoderService;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional(readOnly = true)
@@ -35,25 +33,16 @@ public class UserService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), new ArrayList<>());
     }
 
-    public Boolean checkLogin(String username, String password) {
-        try {
-            UserDetails userDetails = loadUserByUsername(username);
-            return passwordEncoderService.matches(password, userDetails.getPassword());
-        } catch (UsernameNotFoundException e) {
-            return false;
-        }
-    }
-
     @Transactional
     public void changePassword(String username, String oldPassword, String newPassword) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
 
-        if (!passwordEncoderService.matches(oldPassword, user.getPassword())) {
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
             throw new IllegalArgumentException("Invalid old password");
         }
 
-        user.setPassword(passwordEncoderService.encode(newPassword));
+        user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
     }
 }

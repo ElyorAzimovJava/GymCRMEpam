@@ -66,8 +66,7 @@ class TraineeControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.username").value("John.Doe"))
-                .andExpect(jsonPath("$.password").value("password"));
+                .andExpect(jsonPath("$.username").value("John.Doe"));
 
         verify(traineeService, times(1)).createTrainee(any(Trainee.class));
     }

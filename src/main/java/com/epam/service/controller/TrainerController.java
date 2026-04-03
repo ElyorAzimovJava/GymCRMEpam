@@ -39,8 +39,7 @@ public class TrainerController {
         Trainer createdTrainer = trainerService.createTrainer(trainer);
 
         RegistrationResponseDto response = new RegistrationResponseDto(
-                createdTrainer.getUser().getUsername(),
-                createdTrainer.getUser().getPassword()
+                createdTrainer.getUser().getUsername()
         );
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
