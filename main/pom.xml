@@ -17,6 +17,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
+<!--    Child module (main) inherits all dependencies from parent (service) -->
+<!--    service is a parent of main and should not be declared as dependency  -->
+
 <!--        <dependency>-->
 <!--            <groupId>com.epam</groupId>-->
 <!--            <artifactId>service</artifactId>-->
