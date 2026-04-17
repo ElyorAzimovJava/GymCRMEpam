@@ -9,7 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.time.Duration;
 
 @Data
 @AllArgsConstructor
@@ -24,6 +24,7 @@ public class TrainerWorkload {
     private String trainerFirstName;
     private String trainerLastName;
     private boolean isActive;
-    private LocalDate trainingDate;
-    private int trainingDuration;
+    private int year;
+    private int month;
+    private Duration trainingDurationSummary;
 }

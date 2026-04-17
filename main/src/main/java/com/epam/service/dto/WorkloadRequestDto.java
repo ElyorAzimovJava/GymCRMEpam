@@ -1,6 +1,6 @@
-package com.epam.workloadservice.dto;
+package com.epam.service.dto;
 
-import com.epam.workloadservice.enums.TrainingType;
+import com.epam.service.entity.TrainingType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +17,9 @@ public class WorkloadRequestDto {
     private String trainerUsername;
     private String trainerFirstName;
     private String trainerLastName;
+    private String traineeUsername;
+    private String traineeFirstName;
+    private String traineeLastName;
     private boolean isActive;
     private LocalDate trainingDate;
     private Duration trainingDuration;

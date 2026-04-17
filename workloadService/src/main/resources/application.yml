@@ -12,6 +12,7 @@ spring:
     console:
       enabled: true
   jpa:
+    defer-datasource-initialization: true
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: update
@@ -19,3 +20,5 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka/
+jwt:
+  secret: c3VwZXItc2VjdXJlLWp3dC1zZWNyZXQtZm9yLXRlc3RpbmctcHVycG9zZXMtYW5kLW5vdGhpbmctZWxzZQo=

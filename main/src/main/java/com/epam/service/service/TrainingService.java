@@ -1,5 +1,7 @@
 package com.epam.service.service;
 
+import com.epam.service.client.WorkloadClient;
+import com.epam.service.dto.WorkloadRequestDto;
 import com.epam.service.repository.TrainingRepository;
 import com.epam.service.entity.Training;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,8 @@ import java.util.stream.Collectors;
 
 import com.epam.service.entity.TrainingType;
 
+import java.time.Duration;
+import java.time.ZoneId;
 import java.util.Date;
 
 @Slf4j
@@ -21,11 +25,27 @@ import java.util.Date;
 public class TrainingService {
 
     private final TrainingRepository trainingRepository;
+    private final WorkloadClient workloadClient;
 
     @Transactional
     public Training createTraining(Training training) {
         log.info("Creating training: {}", training);
-        return trainingRepository.save(training);
+        Training savedTraining = trainingRepository.save(training);
+        WorkloadRequestDto workloadRequest = WorkloadRequestDto.builder()
+                .trainerUsername(training.getTrainer().getUser().getUsername())
+                .trainerFirstName(training.getTrainer().getUser().getFirstName())
+                .trainerLastName(training.getTrainer().getUser().getLastName())
+                .traineeUsername(training.getTrainee().getUser().getUsername())
+                .traineeFirstName(training.getTrainee().getUser().getFirstName())
+                .traineeLastName(training.getTrainee().getUser().getLastName())
+                .isActive(training.getTrainer().getUser().isActive())
+                .trainingDate(training.getTrainingDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
+                .trainingDuration(training.getTrainingDuration())
+                .trainingType(training.getTrainingType())
+                .actionType("ADD")
+                .build();
+        workloadClient.handleWorkload(workloadRequest);
+        return savedTraining;
     }
 
     @Transactional(readOnly = true)
@@ -37,6 +57,21 @@ public class TrainingService {
     @Transactional
     public void deleteTraining(long id) {
         log.info("Deleting training with id: {}", id);
+        Training training = selectTraining(id);
+        WorkloadRequestDto workloadRequest = WorkloadRequestDto.builder()
+                .trainerUsername(training.getTrainer().getUser().getUsername())
+                .trainerFirstName(training.getTrainer().getUser().getFirstName())
+                .trainerLastName(training.getTrainer().getUser().getLastName())
+                .traineeUsername(training.getTrainee().getUser().getUsername())
+                .traineeFirstName(training.getTrainee().getUser().getFirstName())
+                .traineeLastName(training.getTrainee().getUser().getLastName())
+                .isActive(training.getTrainer().getUser().isActive())
+                .trainingDate(training.getTrainingDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
+                .trainingDuration(training.getTrainingDuration())
+                .trainingType(training.getTrainingType())
+                .actionType("DELETE")
+                .build();
+        workloadClient.handleWorkload(workloadRequest);
         trainingRepository.deleteById(id);
     }
 

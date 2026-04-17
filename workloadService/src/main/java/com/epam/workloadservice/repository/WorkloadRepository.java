@@ -9,6 +9,5 @@ import java.util.Optional;
 
 @Repository
 public interface WorkloadRepository extends JpaRepository<TrainerWorkload, Long> {
-    Optional<TrainerWorkload> findByTrainerUsername(String trainerUsername);
-    Optional<TrainerWorkload> findByTrainerUsernameAndTrainingDateAndTrainingDuration(String trainerUsername, java.time.LocalDate trainingDate, int trainingDuration);
+    Optional<TrainerWorkload> findByTrainerUsernameAndYearAndMonth(String trainerUsername, int year, int month);
 }
