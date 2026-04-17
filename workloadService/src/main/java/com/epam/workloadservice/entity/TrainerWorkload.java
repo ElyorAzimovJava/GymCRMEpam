@@ -1,5 +1,6 @@
 package com.epam.workloadservice.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -24,7 +25,9 @@ public class TrainerWorkload {
     private String trainerFirstName;
     private String trainerLastName;
     private boolean isActive;
+    @Column(name = "`year`")
     private int year;
+    @Column(name = "`month`")
     private int month;
     private Duration trainingDurationSummary;
 }
