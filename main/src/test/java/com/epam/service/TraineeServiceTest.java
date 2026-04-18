@@ -9,6 +9,10 @@ import com.epam.service.entity.Trainer;
 import com.epam.service.service.TraineeService;
 import com.epam.service.service.UserService;
 import com.epam.service.service.UsernameGenerator;
+import com.epam.service.client.WorkloadClient;
+import com.epam.service.dto.WorkloadRequestDto;
+import com.epam.service.entity.Training;
+import com.epam.service.service.TrainingService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.Duration;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -51,6 +56,12 @@ class TraineeServiceTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private WorkloadClient workloadClient;
+
+    @Mock
+    private TrainingService trainingService;
 
     @Test
     void testCreateTrainee() {
@@ -129,9 +140,21 @@ class TraineeServiceTest {
     @Test
     void testDeleteTrainee() {
         long traineeId = 1L;
-        doNothing().when(traineeRepository).deleteById(traineeId);
+        User user = new User();
+        user.setUsername("test.user");
+        Trainee trainee = new Trainee();
+        trainee.setUser(user);
+
+        when(traineeRepository.findById(traineeId)).thenReturn(Optional.of(trainee));
+        when(traineeRepository.findByUserUsername("test.user")).thenReturn(Optional.of(trainee));
+        when(trainingService.getTraineeTrainings(anyString(), any(), any(), any(), any())).thenReturn(Collections.emptyList());
+        doNothing().when(traineeRepository).delete(trainee);
+
         traineeService.deleteTrainee(traineeId);
-        verify(traineeRepository, times(1)).deleteById(traineeId);
+
+        verify(traineeRepository, times(1)).findById(traineeId);
+        verify(traineeRepository, times(1)).findByUserUsername("test.user");
+        verify(traineeRepository, times(1)).delete(trainee);
     }
 
     @Test
@@ -220,17 +243,34 @@ class TraineeServiceTest {
     void testDeleteTraineeByUsername() {
         User user = new User();
         user.setUsername("John.Doe");
+        user.setFirstName("John");
+        user.setLastName("Doe");
 
         Trainee trainee = new Trainee();
         trainee.setId(1L);
         trainee.setUser(user);
 
+        Trainer trainer = new Trainer();
+        trainer.setUser(new User());
+        trainer.getUser().setUsername("trainer.user");
+        trainer.getUser().setFirstName("Trainer");
+        trainer.getUser().setLastName("User");
+        trainer.getUser().setActive(true);
+
+        Training training = new Training();
+        training.setTrainer(trainer);
+        training.setTrainingDate(new Date());
+        training.setTrainingDuration(Duration.ofHours(1));
+
         when(traineeRepository.findByUserUsername("John.Doe")).thenReturn(Optional.of(trainee));
+        when(trainingService.getTraineeTrainings(anyString(), any(), any(), any(), any())).thenReturn(Collections.singletonList(training));
+        doNothing().when(workloadClient).handleWorkload(any(WorkloadRequestDto.class));
         doNothing().when(traineeRepository).delete(trainee);
 
         traineeService.deleteTraineeByUsername("John.Doe");
 
         verify(traineeRepository, times(1)).delete(trainee);
+        verify(workloadClient, times(1)).handleWorkload(any(WorkloadRequestDto.class));
     }
 
     @Test

@@ -1,5 +1,8 @@
 package com.epam.service.service;
 
+import com.epam.service.client.WorkloadClient;
+import com.epam.service.dto.WorkloadRequestDto;
+import com.epam.service.entity.Training;
 import com.epam.service.repository.TraineeRepository;
 import com.epam.service.repository.TrainerRepository;
 import com.epam.service.entity.Trainee;
@@ -12,6 +15,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,6 +31,8 @@ public class TraineeService {
     private final UsernameGenerator usernameGenerator;
     private final CustomMetrics customMetrics;
     private final PasswordEncoder passwordEncoder;
+    private final TrainingService trainingService;
+    private final WorkloadClient workloadClient;
 
     @Transactional
     public Trainee createTrainee(Trainee trainee) {
@@ -56,7 +63,8 @@ public class TraineeService {
     @Transactional
     public void deleteTrainee(long id) {
         log.info("Deleting trainee with id: {}", id);
-        traineeRepository.deleteById(id);
+        Trainee trainee = selectTrainee(id);
+        deleteTraineeByUsername(trainee.getUser().getUsername());
     }
 
     @Transactional(readOnly = true)
@@ -97,6 +105,23 @@ public class TraineeService {
     public void deleteTraineeByUsername(String username) {
         log.info("Deleting trainee with username: {}", username);
         Trainee trainee = selectTraineeByUsername(username);
+        List<Training> trainings = trainingService.getTraineeTrainings(username, null, null, null, null);
+        for (Training training : trainings) {
+            WorkloadRequestDto workloadRequest = WorkloadRequestDto.builder()
+                    .trainerUsername(training.getTrainer().getUser().getUsername())
+                    .trainerFirstName(training.getTrainer().getUser().getFirstName())
+                    .trainerLastName(training.getTrainer().getUser().getLastName())
+                    .traineeUsername(trainee.getUser().getUsername())
+                    .traineeFirstName(trainee.getUser().getFirstName())
+                    .traineeLastName(trainee.getUser().getLastName())
+                    .isActive(training.getTrainer().getUser().isActive())
+                    .trainingDate(training.getTrainingDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
+                    .trainingDuration(Duration.ofMinutes(training.getTrainingDuration().toMinutes()))
+                    .trainingType(training.getTrainingType())
+                    .actionType("DELETE")
+                    .build();
+            workloadClient.handleWorkload(workloadRequest);
+        }
         traineeRepository.delete(trainee);
     }
 
